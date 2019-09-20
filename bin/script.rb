@@ -27,7 +27,7 @@ begin
   loop do
     input = gets
     break if input.nil?
-    q_in << input.strip
+    q_in << input.strip.split(',')
   end
 rescue Interrupt
 end
