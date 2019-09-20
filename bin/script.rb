@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby --jit
 require "bundler/setup"
 require 'gossip'
 puts "Ruby version: #{RUBY_VERSION}"

@@ -20,7 +20,7 @@ module Gossip
         output.each do |ary|
           @pipe.send(ary)
         end
-        sleep 0.1
+        sleep 0.1 if output.empty? && input.nil?
       end
     end
 
