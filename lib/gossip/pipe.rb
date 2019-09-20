@@ -5,12 +5,12 @@ module Gossip
       @q_out = q_out
     end
 
-    def send(address, message)
-      @q_out << [address, message]
+    def send(ary)
+      @q_out << ary
     end
 
     def receive
-      @q_in.pop
+      @q_in.pop unless @q_in.empty?
     end
   end
 end
