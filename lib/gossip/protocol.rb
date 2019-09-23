@@ -3,6 +3,7 @@ module Gossip
     def initialize(pipe)
       @pipe = pipe
       @members = {}
+      @ack_responder = AckResponder.new
     end
 
     def run
@@ -16,10 +17,10 @@ module Gossip
         update_members(delta)
 
         # output
-        output = @members.values.flat_map(&:prepare_output)
-        output.each do |ary|
-          @pipe.send(ary)
-        end
+        x = @members.values
+        x << @ack_responder
+        output = x.flat_map(&:prepare_output)
+        output.each { |ary| @pipe.send(ary) }
         sleep 0.1 if output.empty? && input.nil?
       end
     end
@@ -27,7 +28,9 @@ module Gossip
     private
 
     def update_member(input)
-      member_id, = input
+      member_id, message = input
+      message.strip!
+      @ack_responder.schedule_ack(member_id) if message == 'ping'
       @members[member_id] ||= Member.new(member_id)
     end
 
