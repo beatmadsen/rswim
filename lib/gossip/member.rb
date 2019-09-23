@@ -11,6 +11,10 @@ module Gossip
     def prepare_output
       @state.prepare_output
     end
+
+    def health
+      @state.health
+    end
   end
 
   module MemberState
@@ -30,6 +34,10 @@ module Gossip
       def prepare_output
         []
       end
+
+      def health
+        'up'
+      end
     end
 
     class BeforePing
@@ -39,7 +47,7 @@ module Gossip
       end
 
       def advance(_elapsed_seconds)
-        if @done then AfterPing.new(@id)
+        if @done then AfterPingBeforeAck.new(@id)
         else self
         end
       end
@@ -48,9 +56,13 @@ module Gossip
         @done = true
         [[@id, 'ping']]
       end
+
+      def health
+        'up'
+      end
     end
 
-    class AfterPing
+    class AfterPingBeforeAck
       def initialize(id)
         @id = id
         @life_time_seconds = 0
@@ -65,6 +77,10 @@ module Gossip
 
       def prepare_output
         []
+      end
+
+      def health
+        'awaiting response'
       end
     end
   end

@@ -8,6 +8,7 @@ module Gossip
 
     def run
       t = Time.now
+      n = 0
       loop do
         input = @pipe.receive
         update_member(input) unless input.nil?
@@ -21,11 +22,26 @@ module Gossip
         x << @ack_responder
         output = x.flat_map(&:prepare_output)
         output.each { |ary| @pipe.send(ary) }
+
+        print_report if (n += 1) % 100 == 0
+
         sleep 0.1 if output.empty? && input.nil?
       end
     end
 
     private
+
+    def print_report
+      a = <<~REPORT
+
+        ====================================
+         Status report:
+        ====================================
+
+      REPORT
+      b = @members.map { |k, m| "#{k}: #{m.health}\n" }.join
+      puts a + b
+    end
 
     def update_member(input)
       member_id, message = input
