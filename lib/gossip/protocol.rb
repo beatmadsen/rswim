@@ -47,7 +47,10 @@ module Gossip
       member_id, message = input
       message.strip!
       @ack_responder.schedule_ack(member_id) if message == 'ping'
-      @members[member_id] ||= Member.new(member_id)
+      member = @members[member_id] ||= Member.new(member_id)
+      member.replied_with_ack if message == 'ack'
+    rescue StandardError => e
+      puts e.inspect
     end
 
     def update_members(elapsed_seconds)

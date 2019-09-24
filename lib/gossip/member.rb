@@ -4,6 +4,11 @@ module Gossip
       @state = MemberState::Init.new(id)
     end
 
+    #  call this when you received ack from member
+    def replied_with_ack
+      @state.member_replied_with_ack
+    end
+
     def update(elapsed_seconds)
       @state = @state.advance(elapsed_seconds)
     end
@@ -23,6 +28,8 @@ module Gossip
         @id = id
         @life_time_seconds = 0
       end
+
+      def member_replied_with_ack; end
 
       def advance(elapsed_seconds)
         @life_time_seconds += elapsed_seconds
@@ -46,6 +53,8 @@ module Gossip
         @done = false
       end
 
+      def member_replied_with_ack; end
+
       def advance(_elapsed_seconds)
         if @done then AfterPingBeforeAck.new(@id)
         else self
@@ -66,11 +75,17 @@ module Gossip
       def initialize(id)
         @id = id
         @life_time_seconds = 0
+        @done = false
+      end
+
+      def member_replied_with_ack
+        @done = true
       end
 
       def advance(elapsed_seconds)
         @life_time_seconds += elapsed_seconds
-        if @life_time_seconds > 20 then BeforePing.new(@id)
+        if @done then AfterAck.new(@id)
+        elsif @life_time_seconds > 20 then BeforePing.new(@id)
         else self
         end
       end
@@ -81,6 +96,26 @@ module Gossip
 
       def health
         'awaiting response'
+      end
+    end
+
+    class AfterAck
+      def initialize(id)
+        @id = id
+      end
+
+      def member_replied_with_ack; end
+
+      def advance(_elapsed_seconds)
+        self
+      end
+
+      def prepare_output
+        []
+      end
+
+      def health
+        'alive'
       end
     end
   end
