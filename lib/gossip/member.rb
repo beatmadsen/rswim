@@ -1,7 +1,17 @@
 module Gossip
   class Member
     def initialize(id)
+      @id  = id
       @state = MemberState::Init.new(id)
+    end
+
+    # call this when you wish to send a ping message to member
+    def ping
+      @state = MemberState::BeforePing.new(@id)
+    end
+
+    def healthy?
+      health == 'up' || health == 'alive'
     end
 
     #  call this when you received ack from member
@@ -26,16 +36,12 @@ module Gossip
     class Init
       def initialize(id)
         @id = id
-        @life_time_seconds = 0
       end
 
       def member_replied_with_ack; end
 
       def advance(elapsed_seconds)
-        @life_time_seconds += elapsed_seconds
-        if @life_time_seconds > 10 then BeforePing.new(@id)
-        else self
-        end
+        self
       end
 
       def prepare_output

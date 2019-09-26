@@ -20,16 +20,27 @@ module Gossip
         # output
         x = @members.values
         x << @ack_responder
+        # puts "### DEBUG x: #{x}" if x.size > 1
         output = x.flat_map(&:prepare_output)
         output.each { |ary| @pipe.send(ary) }
 
-        print_report if (n += 1) % 100 == 0
+        n += 1
+        ping_member if n % 400 == 0 # TODO: protocol period
+        print_report if n % 100 == 0
 
         sleep 0.1 if output.empty? && input.nil?
       end
     end
 
     private
+
+    def ping_member
+      ms = @members.values.select { |m| m.healthy? }
+      return if ms.empty?
+      index = ms.one? ? 0 : rand(ms.size)
+      member = ms[index]
+      member.ping
+    end
 
     def print_report
       a = <<~REPORT
