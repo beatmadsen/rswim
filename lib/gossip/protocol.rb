@@ -8,17 +8,14 @@ module Gossip
 
     def run
       n = 0
-      t = Time.now
       loop do
-        inputs = @pipe.receive
-        inputs.each do |input|
-          update_member(input)
-        end
+        n += 1
 
-        t_old = t
-        t = Time.now
-        delta = t - t_old
-        update_members(delta)
+        input = @pipe.receive
+        input.each { |line| update_member(line) }
+
+        delta_seconds = 0.010
+        update_members(delta_seconds)
 
         # output
         x = @members.values
@@ -27,38 +24,28 @@ module Gossip
         output = x.flat_map(&:prepare_output)
         output.each { |ary| @pipe.send(ary) }
 
-        n += 1
         ping_member if n % 1000 == 0 # TODO: protocol period
         print_report if n % 2000 == 0
 
-        sleep 0.010 # 10 ms
+        sleep delta_seconds
       end
     end
 
     private
 
     def ping_member
-      ms = @members.values.select { |m| m.healthy? }
+      ms = @members.values.select(&:healthy?)
       return if ms.empty?
+
       index = ms.one? ? 0 : rand(ms.size)
       member = ms[index]
       member.ping
     end
 
-    def print_report
-      a = <<~REPORT
+    def print_report; end
 
-        ====================================
-         Status report:
-        ====================================
-
-      REPORT
-      b = @members.map { |k, m| "#{k}: #{m.health}\n" }.join
-      puts a + b
-    end
-
-    def update_member(input)
-      member_id, message = input
+    def update_member(line)
+      member_id, message = line
       message.strip!
       @ack_responder.schedule_ack(member_id) if message == 'ping'
       member = @members[member_id] ||= Member.new(member_id)
