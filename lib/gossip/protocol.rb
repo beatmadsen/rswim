@@ -7,11 +7,14 @@ module Gossip
     end
 
     def run
-      t = Time.now
       n = 0
+      t = Time.now
       loop do
-        input = @pipe.receive
-        update_member(input) unless input.nil?
+        inputs = @pipe.receive
+        inputs.each do |input|
+          update_member(input)
+        end
+
         t_old = t
         t = Time.now
         delta = t - t_old
@@ -25,10 +28,10 @@ module Gossip
         output.each { |ary| @pipe.send(ary) }
 
         n += 1
-        ping_member if n % 400 == 0 # TODO: protocol period
-        print_report if n % 100 == 0
+        ping_member if n % 1000 == 0 # TODO: protocol period
+        print_report if n % 2000 == 0
 
-        sleep 0.1 if output.empty? && input.nil?
+        sleep 0.010 # 10 ms
       end
     end
 

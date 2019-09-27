@@ -9,8 +9,9 @@ module Gossip
       @q_out << ary
     end
 
+    # returns list of inputs. Empty if none have been received
     def receive
-      @q_in.pop unless @q_in.empty?
+      Array.new(@q_in.size) { @q_in.pop }.tap(&:compact!)
     end
   end
 end
