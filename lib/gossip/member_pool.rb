@@ -9,7 +9,7 @@ module Gossip
       member_id, message = line
       message.strip!
       @ack_responder.schedule_ack(member_id) if message == 'ping'
-      member = (@members[member_id] ||= Member.new(member_id))
+      member = @members[member_id] ||= Member.new(member_id, self)
       member.replied_with_ack if message == 'ack'
     end
 
@@ -36,6 +36,14 @@ module Gossip
       index = ms.one? ? 0 : rand(ms.size)
       member = ms[index]
       member.ping
+    end
+
+    def ping_request_to_k_members(target_id)
+      @members.values.select(&:healthy?).take(K).each { |m| m.ping_request(target_id) }
+    end
+
+    def indirect_ack(target_id)
+      @members[target_id].replied_with_ack
     end
   end
 end

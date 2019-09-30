@@ -1,17 +1,22 @@
 module Gossip
   class Member
-    def initialize(id)
+    def initialize(id, member_pool)
       @id  = id
-      @state = MemberState::Init.new(id)
+      @member_pool = member_pool
+      @state = MemberState::Init.new(id, member_pool)
     end
 
     # call this when you wish to send a ping message to member
     def ping
-      @state = MemberState::BeforePing.new(@id)
+      @state = MemberState::BeforePing.new(@id, @member_pool)
+    end
+
+    def ping_request(target_id)
+      @state = MemberState::BeforePingRequest.new(@id, @member_pool, target_id)
     end
 
     def healthy?
-      health == 'up' || health == 'alive'
+      health == 'alive'
     end
 
     #  call this when you received ack from member

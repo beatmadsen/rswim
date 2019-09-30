@@ -8,6 +8,14 @@ require "gossip/protocol"
 require "gossip/ack_responder"
 
 module Gossip
+  K = 3
+
+  # Protocol time, millis
+  T_MS = 30000
+
+  # Roundtrip time, millis
+  R_MS = 10000
+
   class Error < StandardError; end
   # Your code goes here...
 end
