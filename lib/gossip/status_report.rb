@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gossip
   class StatusReport
     def self.print(members)
@@ -10,9 +12,9 @@ module Gossip
 
         #{b}
         ====================================
-        
+
       REPORT
-      puts a
+      warn a
     end
   end
 end

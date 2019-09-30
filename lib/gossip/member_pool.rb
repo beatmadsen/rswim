@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gossip
   class MemberPool
     def initialize
@@ -9,8 +11,15 @@ module Gossip
       member_id, message = line
       message.strip!
       @ack_responder.schedule_ack(member_id) if message == 'ping'
-      member = @members[member_id] ||= Member.new(member_id, self)
-      member.replied_with_ack if message == 'ack'
+      member = member(member_id)
+      case message
+      when 'ack'
+        member.replied_with_ack
+      when /^ping-req (.+)/
+        target_id = Regexp.last_match(1)
+        target = member(target_id)
+        target.forward_ping(member_id)
+      end
     end
 
     def update_members(elapsed_seconds)
@@ -44,6 +53,12 @@ module Gossip
 
     def indirect_ack(target_id)
       @members[target_id].replied_with_ack
+    end
+
+    private
+
+    def member(id)
+      @members[id] ||= Member.new(id, self)
     end
   end
 end

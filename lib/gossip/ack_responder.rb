@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gossip
   class AckResponder
     def initialize

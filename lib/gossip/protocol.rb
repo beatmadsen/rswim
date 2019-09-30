@@ -9,6 +9,7 @@ module Gossip
 
     def run
       raise if T_MS % 10 > 0
+
       n = 0
       loop do
         delta_seconds = 0.010

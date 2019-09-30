@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gossip
   class Pipe
     def initialize(q_in, q_out)
