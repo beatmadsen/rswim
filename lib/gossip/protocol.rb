@@ -3,39 +3,26 @@
 module Gossip
   class Protocol
     def initialize(pipe)
-      @pipe = pipe
-      @member_pool = MemberPool.new
+      @state = ProtocolState.new(pipe)
     end
 
     def run
-      raise if T_MS % 10 > 0
-
-      n = 0
+      t = monotonic_seconds
       loop do
-        delta_seconds = 0.010
-        n += 10 # add 10 millis
+        t_dash = monotonic_seconds
+        delta_seconds = t_dash - t
+        t = t_dash
 
-        input = @pipe.receive
-        input.each { |line| update_member(line) }
+        @state.advance(delta_seconds)
 
-        @member_pool.update_members(delta_seconds)
-
-        output = @member_pool.prepare_output
-        output.each { |ary| @pipe.send(ary) }
-
-        @member_pool.ping_random_healthy_member if n % T_MS == 0
-        @member_pool.status_report if n % R_MS == 0
-
-        sleep delta_seconds
+        sleep 0.1
       end
     end
 
     private
 
-    def update_member(line)
-      @member_pool.update_member(line)
-    rescue StandardError => e
-      puts e.inspect
+    def monotonic_seconds
+      Process.clock_gettime(Process::CLOCK_MONOTONIC)
     end
   end
 end

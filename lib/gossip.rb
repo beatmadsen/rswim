@@ -1,13 +1,8 @@
 # frozen_string_literal: true
 
-require 'gossip/version'
-require 'gossip/pipe'
-require 'gossip/member'
-require 'gossip/member_state'
-require 'gossip/member_pool'
-require 'gossip/status_report'
-require 'gossip/protocol'
-require 'gossip/ack_responder'
+require "zeitwerk"
+loader = Zeitwerk::Loader.for_gem
+loader.setup # ready!
 
 module Gossip
   K = 3
