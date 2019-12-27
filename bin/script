@@ -3,9 +3,7 @@ require "bundler/setup"
 require 'gossip'
 puts "Ruby version: #{RUBY_VERSION}"
 
-
-q_in, q_out = 2.times.map { Queue.new }
-pipe = Gossip::Pipe.new(q_in, q_out)
+pipe = Gossip::Pipe.simple
 protocol = Gossip::Protocol.new(pipe)
 
 # Protocol thread
