@@ -29,10 +29,14 @@ module Gossip
 
     private
 
+    def logger
+      @_logger ||= Logger.new(self.class, STDERR)
+    end
+
     def update_member(line)
       @member_pool.update_member(line)
     rescue StandardError => e
-      puts e.inspect
+      logger.error(e)
     end
   end
 end

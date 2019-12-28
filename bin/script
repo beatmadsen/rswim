@@ -14,7 +14,7 @@ end
 # Output thread (stdout)
 Thread.new do
   loop do
-    receiver, message = q_out.pop
+    receiver, message = pipe.q_out.pop
     puts "Message for #{receiver}: '#{message}'"
   end
 end
@@ -25,7 +25,7 @@ begin
   loop do
     input = gets
     break if input.nil?
-    q_in << input.strip.split(',')
+    pipe.q_in << input.strip.split(',')
   end
 rescue Interrupt
 end

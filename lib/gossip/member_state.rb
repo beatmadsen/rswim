@@ -24,9 +24,7 @@ module Gossip
 
       def logger
         @_logger ||= begin
-          l = Logger.new(STDERR)
-          l.formatter = proc { |s, _t, _p, msg| "#{s}: #{self.class.name}: #{String === msg ? msg : msg.inspect}\n" }
-          l
+          Gossip::Logger.new(self.class, STDERR)
         end
       end
     end

@@ -22,7 +22,7 @@ module Gossip
       private
 
       def logger
-        @_logger ||= Logger.new('log/status.log', 10, 1024000)
+        @_logger ||= Logger.new(self, 'log/status.log', 10, 1024000)
       end
     end
   end

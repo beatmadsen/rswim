@@ -8,6 +8,7 @@ module Gossip
     end
 
     def update_member(line)
+      raise 'bad input' if line.size < 2
       member_id, message = line
       message.strip!
       @ack_responder.schedule_ack(member_id) if message == 'ping'
