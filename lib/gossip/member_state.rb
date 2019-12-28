@@ -2,8 +2,10 @@
 
 module Gossip
   module MemberState
-    class Init
+
+    class Base
       def initialize(id, member_pool)
+        logger.debug("Member with id #{id} entered new state")
         @member_pool = member_pool
         @id = id
       end
@@ -18,20 +20,35 @@ module Gossip
         []
       end
 
+      private
+
+      def logger
+        @_logger ||= begin
+          l = Logger.new(STDERR)
+          l.formatter = proc { |s, _t, _p, msg| "#{s}: #{self.class.name}: #{String === msg ? msg : msg.inspect}\n" }
+          l
+        end
+      end
+    end
+
+
+    class Init < Base
+
+      def initialize(id, member_pool)
+        super
+      end
+
       def health
         'alive'
       end
     end
 
-    class BeforeForwardedPing
+    class BeforeForwardedPing < Base
       def initialize(id, member_pool, source_id)
-        @member_pool = member_pool
-        @id = id
         @source_id = source_id
         @done = false
+        super(id, member_pool)
       end
-
-      def member_replied_with_ack; end
 
       def advance(_elapsed_seconds)
         if @done then AfterForwardedPingBeforeAck.new(@id, @member_pool, @source_id)
@@ -49,11 +66,10 @@ module Gossip
       end
     end
 
-    class BeforePing
+    class BeforePing < Base
       def initialize(id, member_pool)
-        @member_pool = member_pool
-        @id = id
         @done = false
+        super
       end
 
       def member_replied_with_ack; end
@@ -74,15 +90,12 @@ module Gossip
       end
     end
 
-    class BeforePingRequest
+    class BeforePingRequest < Base
       def initialize(id, member_pool, target_id)
-        @id = id
-        @member_pool = member_pool
         @target_id = target_id
         @done = false
+        super(id, member_pool)
       end
-
-      def member_replied_with_ack; end
 
       def advance(_elapsed_seconds)
         if @done then AfterPingRequestBeforeAck.new(@id, @member_pool, @target_id)
@@ -100,13 +113,12 @@ module Gossip
       end
     end
 
-    class AfterForwardedPingBeforeAck
+    class AfterForwardedPingBeforeAck < Base
       def initialize(id, member_pool, source_id)
-        @member_pool = member_pool
-        @id = id
         @source_id = source_id
         @life_time_seconds = 0
         @done = false
+        super(id, member_pool)
       end
 
       def member_replied_with_ack
@@ -121,24 +133,17 @@ module Gossip
         end
       end
 
-      def prepare_output
-        []
-      end
-
       def health
         'awaiting response'
       end
     end
 
-    class AfterForwardedPingAfterAck
+    class AfterForwardedPingAfterAck < Base
       def initialize(id, member_pool, source_id)
-        @member_pool = member_pool
-        @id = id
         @source_id = source_id
         @done = false
+        super(id, member_pool)
       end
-
-      def member_replied_with_ack; end
 
       def advance(_elapsed_seconds)
         if @done then Init.new(@id, @member_pool)
@@ -156,12 +161,11 @@ module Gossip
       end
     end
 
-    class AfterPingBeforeAck
+    class AfterPingBeforeAck < Base
       def initialize(id, member_pool)
-        @member_pool = member_pool
-        @id = id
         @life_time_seconds = 0
         @done = false
+        super
       end
 
       def member_replied_with_ack
@@ -176,22 +180,17 @@ module Gossip
         end
       end
 
-      def prepare_output
-        []
-      end
-
       def health
         'awaiting response'
       end
     end
 
-    class AfterPingRequestBeforeAck
+    class AfterPingRequestBeforeAck < Base
       def initialize(id, member_pool, target_id)
-        @id = id
-        @member_pool = member_pool
         @target_id = target_id
         @life_time_seconds = 0
         @done = false
+        super(id, member_pool)
       end
 
       def member_replied_with_ack
@@ -206,22 +205,17 @@ module Gossip
         end
       end
 
-      def prepare_output
-        []
-      end
-
       def health
         'alive'
       end
     end
 
-    class Suspected
+    class Suspected < Base
       def initialize(id, member_pool, send_ping_request)
-        @member_pool = member_pool
-        @id = id
         @send_ping_request = send_ping_request
         @ping_request_sent = false
         @received_ack = false
+        super(id, member_pool)
       end
 
       def member_replied_with_ack
@@ -238,10 +232,6 @@ module Gossip
           end
           self
         end
-      end
-
-      def prepare_output
-        []
       end
 
       def health

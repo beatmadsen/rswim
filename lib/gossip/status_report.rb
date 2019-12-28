@@ -2,19 +2,28 @@
 
 module Gossip
   class StatusReport
-    def self.print(members)
-      b = members.map { |k, m| "#{k}: #{m.health}\n" }.join
-      a = <<~REPORT
+    class << self
+
+      def print(members)
+        b = members.map { |k, m| "#{k}: #{m.health}\n" }.join
+        a = <<~REPORT
 
         ====================================
-         Status report:
+        Status report:
         ====================================
 
         #{b}
         ====================================
 
-      REPORT
-      warn a
+        REPORT
+        logger.info(a)
+      end
+
+      private
+
+      def logger
+        @_logger ||= Logger.new('log/status.log', 10, 1024000)
+      end
     end
   end
 end

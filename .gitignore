@@ -5,7 +5,12 @@
 /doc/
 /pkg/
 /spec/reports/
-/tmp/
+
+# Ignore all logfiles and tempfiles.
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
 
 # rspec failure tracking
 .rspec_status

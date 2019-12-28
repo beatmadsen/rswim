@@ -15,7 +15,7 @@ module Gossip
       @r += elapsed_seconds * 1000
       @r = 0 if @r >= R_MS
 
-      input = @pipe.receive
+      input = @pipe.inbound
       input.each { |line| update_member(line) }
 
       @member_pool.update_members(elapsed_seconds)

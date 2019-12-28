@@ -16,8 +16,13 @@ module Gossip
     end
 
     # returns list of inputs. Empty if none have been received
-    def receive
+    def inbound
       Array.new(@q_in.size) { @q_in.pop }.tap(&:compact!)
+    end
+
+    # returns list of outputs. Empty if none have been sent
+    def outbound
+      Array.new(@q_out.size) { @q_out.pop }.tap(&:compact!)
     end
 
     class Simple < Pipe
