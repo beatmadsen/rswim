@@ -2,8 +2,8 @@
 
 module Gossip
   class Protocol
-    def initialize(pipe)
-      @state = ProtocolState.new(pipe)
+    def initialize(pipe, t_ms = T_MS, r_ms = R_MS)
+      @state = ProtocolState.new(pipe, t_ms, r_ms)
     end
 
     def run

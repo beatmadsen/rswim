@@ -15,6 +15,10 @@ module Gossip
       @q_out << ary
     end
 
+    def inverse
+      Pipe.new(q_out, q_in)
+    end
+
     # returns list of inputs. Empty if none have been received
     def inbound
       Array.new(@q_in.size) { @q_in.pop }.tap(&:compact!)
