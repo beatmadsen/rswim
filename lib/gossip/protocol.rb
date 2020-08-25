@@ -1,28 +1,63 @@
 # frozen_string_literal: true
 
 module Gossip
-  class Protocol
-    def initialize(pipe, t_ms = T_MS, r_ms = R_MS)
-      @state = ProtocolState.new(pipe, t_ms, r_ms)
-    end
+  module Protocol
+    class Base
+      def initialize(pipe, t_ms, r_ms)
+        @state = ProtocolState.new(pipe, t_ms, r_ms)
+      end
 
-    def run
-      t = monotonic_seconds
-      loop do
-        t_dash = monotonic_seconds
-        delta_seconds = t_dash - t
-        t = t_dash
+      def run
+        loop do
+          elapsed_seconds = pause
+          @state.advance(elapsed_seconds)
+        end
+      end
 
-        @state.advance(delta_seconds)
+      protected
 
-        sleep 0.1
+      def pause
+        raise 'implement this in a subclass'
+      end
+
+      def monotonic_seconds
+        Process.clock_gettime(Process::CLOCK_MONOTONIC)
       end
     end
 
-    private
+    class SleepBased < Base
+      def initialize(pipe, sleep_time_seconds = 0.1, t_ms = T_MS, r_ms = R_MS)
+        super(pipe, t_ms, r_ms)
+        @sleep_time_seconds = sleep_time_seconds
+      end
 
-    def monotonic_seconds
-      Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      protected
+
+      def pause
+        t = monotonic_seconds
+        sleep @sleep_time_seconds
+        t′ = monotonic_seconds
+        t′ - t
+      end
+    end
+
+    class FiberBased < Base
+      def run
+        @f = Fiber.new { super }
+      end
+
+      def resume
+        @f.resume
+      end
+
+      protected
+
+      def pause
+        t = monotonic_seconds
+        Fiber.yield
+        t′ = monotonic_seconds
+        t′ - t
+      end
     end
   end
 end
