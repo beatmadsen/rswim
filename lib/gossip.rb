@@ -1,6 +1,8 @@
 # frozen_string_literal: true
-require "logger"
-require "zeitwerk"
+
+require 'logger'
+require 'zeitwerk'
+require 'byebug'
 loader = Zeitwerk::Loader.for_gem
 loader.setup # ready!
 

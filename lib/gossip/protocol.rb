@@ -4,13 +4,15 @@ module Gossip
   module Protocol
     class Base
       def initialize(pipe, t_ms, r_ms)
-        @state = ProtocolState.new(pipe, t_ms, r_ms)
+        @pipe = pipe
+        @state = ProtocolState.new(t_ms, r_ms)
       end
 
       def run
         loop do
           elapsed_seconds = pause
-          @state.advance(elapsed_seconds)
+          output_messages = @state.advance(@pipe.inbound, elapsed_seconds)
+          output_messages.each { |line| @pipe.send(line) }
         end
       end
 

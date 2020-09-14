@@ -7,6 +7,7 @@ module Gossip
       @ack_responder = AckResponder.new
     end
 
+    # TODO: use structured data instead of array
     def update_member(line)
       raise 'bad input' if line.size < 2
       member_id, message = line

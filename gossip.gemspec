@@ -35,4 +35,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency 'guard-rspec', '~> 4.7'
   spec.add_development_dependency 'fuubar', '~> 2.5'
+  spec.add_development_dependency 'byebug'
 end
