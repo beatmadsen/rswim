@@ -12,7 +12,7 @@ module Gossip
         loop do
           elapsed_seconds = pause
           output_messages = @state.advance(@pipe.inbound, elapsed_seconds)
-          output_messages.each { |line| @pipe.send(line) }
+          output_messages.each { |message| @pipe.send(message) }
         end
       end
 

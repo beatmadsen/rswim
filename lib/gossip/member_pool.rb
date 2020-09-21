@@ -7,20 +7,16 @@ module Gossip
       @ack_responder = AckResponder.new
     end
 
-    # TODO: use structured data instead of array
-    def update_member(line)
-      raise 'bad input' if line.size < 2
-      member_id, message = line
-      message.strip!
-      @ack_responder.schedule_ack(member_id) if message == 'ping'
-      member = member(member_id)
-      case message
-      when 'ack'
-        member.replied_with_ack
-      when /^ping-req (.+)/
-        target_id = Regexp.last_match(1)
-        target = member(target_id)
-        target.forward_ping(member_id)
+    def update_member(message)
+      sender = member(message.from) # NB: records member if not seen before
+      case message.type
+      when :ping
+        @ack_responder.schedule_ack(message.from)
+      when :ack
+        sender.replied_with_ack
+      when :ping_req
+        target_id = message.payload[:target_id]
+        member(target_id).forward_ping(member_id)
       end
     end
 

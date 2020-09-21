@@ -56,7 +56,8 @@ module Gossip
 
       def prepare_output
         @done = true
-        [[@id, 'ping']]
+        message = Message::Outbound.new(@id, :ping)
+        [message]
       end
 
       def health
@@ -80,7 +81,8 @@ module Gossip
 
       def prepare_output
         @done = true
-        [[@id, 'ping']]
+        message = Message::Outbound.new(@id, :ping)
+        [message]
       end
 
       def health
@@ -103,7 +105,8 @@ module Gossip
 
       def prepare_output
         @done = true
-        [[@id, "ping-req #{@target_id}"]]
+        message = Message::Outbound.new(@id, :ping_req, target_id: @target_id)
+        [message]
       end
 
       def health
@@ -151,7 +154,8 @@ module Gossip
 
       def prepare_output
         @done = true
-        [[@source_id, 'ack']]
+        message = Message::Outbound.new(@source_id, :ack)
+        [message]
       end
 
       def health

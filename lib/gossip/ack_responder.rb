@@ -11,7 +11,7 @@ module Gossip
     end
 
     def prepare_output
-      result = @pending.map { |member_id| [member_id, 'ack'] }
+      result = @pending.map { |member_id| Message::Outbound.new(member_id, :ack) }
       @pending.clear
       result
     end

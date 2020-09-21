@@ -17,10 +17,10 @@ module Gossip
       @r += elapsed_seconds * 1000
       @r = 0 if @r >= @r_ms
 
-      input_messages.each do |line|
-        raise 'line must be array' unless line.is_a? Array
+      input_messages.each do |message|
+        raise 'message must be of type Message::Inbound' unless message.is_a? Message::Inbound
 
-        update_member(line)
+        update_member(message)
       end
 
       @member_pool.update_members(elapsed_seconds)
@@ -39,8 +39,8 @@ module Gossip
       @_logger ||= Logger.new(self.class, STDERR)
     end
 
-    def update_member(line)
-      @member_pool.update_member(line)
+    def update_member(message)
+      @member_pool.update_member(message)
     rescue StandardError => e
       logger.error(e)
     end
