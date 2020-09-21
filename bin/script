@@ -14,8 +14,8 @@ end
 # Output thread (stdout)
 Thread.new do
   loop do
-    receiver, message = pipe.q_out.pop
-    puts "Message for #{receiver}: '#{message}'"
+    message = pipe.q_out.pop
+    puts "Message for #{message.to}: '#{message.type}'"
   end
 end
 
@@ -25,7 +25,13 @@ begin
   loop do
     input = gets
     break if input.nil?
-    pipe.q_in << input.strip.split(',')
+    # TODO: Input
+    ary = input.strip.split(' ')
+    type = ary[1].gsub(/-/, "_").to_sym
+    payload = { target_id: ary[2] } if type == :ping_req
+    message = Gossip::Message::Inbound.new(ary[0], type, payload)
+
+    pipe.q_in << message
   end
 rescue Interrupt
 end

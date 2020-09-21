@@ -16,7 +16,7 @@ module Gossip
         sender.replied_with_ack
       when :ping_req
         target_id = message.payload[:target_id]
-        member(target_id).forward_ping(member_id)
+        member(target_id).forward_ping(message.from)
       end
     end
 
