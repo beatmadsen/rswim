@@ -1,15 +1,17 @@
 # frozen_string_literal: true
 
 module Gossip
-  class Message
-    attr_reader :type, :payload
+  module Message
+    class Base
+      attr_reader :type, :payload
 
-    def initialize(type, payload)
-      @type = type
-      @payload = payload
+      def initialize(type, payload)
+        @type = type
+        @payload = payload
+      end
     end
 
-    class Outbound < Message
+    class Outbound < Base
       attr_reader :to
 
       def initialize(to, type, payload = {})
@@ -18,7 +20,7 @@ module Gossip
       end
     end
 
-    class Inbound < Message
+    class Inbound < Base
       attr_reader :from
 
       def initialize(from, type, payload = {})

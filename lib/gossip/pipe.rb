@@ -11,18 +11,13 @@ module Gossip
       @q_out = q_out
     end
 
-    def send(ary)
-      @q_out << ary
+    def send(message)
+      @q_out << message
     end
 
     # returns list of inputs. Empty if none have been received
     def inbound
       Array.new(@q_in.size) { @q_in.pop }.tap(&:compact!)
-    end
-
-    # returns list of outputs. Empty if none have been sent
-    def outbound
-      Array.new(@q_out.size) { @q_out.pop }.tap(&:compact!)
     end
 
     class Simple < Pipe

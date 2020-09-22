@@ -2,14 +2,13 @@
 
 module Gossip
   class ProtocolState
-    def initialize(t_ms, r_ms)
+    def initialize(t_ms, r_ms, seed_member_ids)
       @t_ms = t_ms
       @r_ms = r_ms
-      @member_pool = MemberPool.new
+      @member_pool = MemberPool.new(seed_member_ids)
       @t = @r = 1
     end
 
-    # TODO: move to structured input data instead of arrays
     def advance(input_messages, elapsed_seconds)
       @t += elapsed_seconds * 1000
       @t = 0 if @t >= @t_ms

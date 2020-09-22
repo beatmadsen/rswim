@@ -4,7 +4,7 @@ require 'gossip'
 puts "Ruby version: #{RUBY_VERSION}"
 
 pipe = Gossip::Pipe.simple
-protocol = Gossip::Protocol::SleepBased.new(pipe)
+protocol = Gossip::Protocol::SleepBased.new(pipe, ['root-1', 'root-2'])
 
 # Protocol thread
 Thread.new do

@@ -2,8 +2,9 @@
 
 module Gossip
   class MemberPool
-    def initialize
+    def initialize(seed_member_ids)
       @members = {}
+      seed_member_ids.each { |id| member(id) }
       @ack_responder = AckResponder.new
     end
 

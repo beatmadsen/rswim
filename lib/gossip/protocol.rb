@@ -3,9 +3,9 @@
 module Gossip
   module Protocol
     class Base
-      def initialize(pipe, t_ms, r_ms)
+      def initialize(pipe, seed_member_ids, t_ms, r_ms)
         @pipe = pipe
-        @state = ProtocolState.new(t_ms, r_ms)
+        @state = ProtocolState.new(t_ms, r_ms, seed_member_ids)
       end
 
       def run
@@ -28,8 +28,8 @@ module Gossip
     end
 
     class SleepBased < Base
-      def initialize(pipe, sleep_time_seconds = 0.1, t_ms = T_MS, r_ms = R_MS)
-        super(pipe, t_ms, r_ms)
+      def initialize(pipe, seed_member_ids, sleep_time_seconds = 0.1, t_ms = T_MS, r_ms = R_MS)
+        super(pipe, seed_member_ids, t_ms, r_ms)
         @sleep_time_seconds = sleep_time_seconds
       end
 
