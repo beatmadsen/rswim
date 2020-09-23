@@ -6,6 +6,7 @@ module Gossip
       @members = {}
       seed_member_ids.each { |id| member(id) }
       @ack_responder = AckResponder.new
+      @recent_updates = [] # should point to members who were recently suspected or freed of suspicion
     end
 
     def update_member(message)
@@ -19,6 +20,11 @@ module Gossip
         target_id = message.payload[:target_id]
         member(target_id).forward_ping(message.from)
       end
+      update_suspicions(message.payload[:updates])
+    end
+
+    def update_suspicions(updates)
+      # TODO
     end
 
     def update_members(elapsed_seconds)
@@ -30,11 +36,23 @@ module Gossip
     end
 
     def prepare_output
-      # output
+      update_entries = @members.map { |_k, member| member.prepare_update_entry }
+                               .sort_by { |entry| 100 - entry.propagation_count }
+                               .group_by(&:status)
+                               .then { |groups| Array.new(10, nil).zip(*groups.values) }
+                               .flatten
+                               .compact
+                               .take(10) # TODO: constant
+
+      update_entries.each do |entry|
+        member(entry.member_id).increment_propagation_count
+      end
+
       x = @members.values
       x << @ack_responder
-      # puts "### DEBUG x: #{x}" if x.size > 1
-      x.flat_map(&:prepare_output)
+      ms = x.flat_map(&:prepare_output)
+      ms.each { |message| message.payload[:updates] = update_entries }
+      ms
     end
 
     def ping_random_healthy_member
