@@ -2,18 +2,17 @@
 
 module Gossip
   class MemberPool
-    def initialize(seed_member_ids)
-      @members = {}
+    def initialize(node_member_id, seed_member_ids)
+      @me = Member::Me(node_member_id)
+      @members = { node_member_id: @me }
       seed_member_ids.each { |id| member(id) }
-      @ack_responder = AckResponder.new
-      @recent_updates = [] # should point to members who were recently suspected or freed of suspicion
     end
 
     def update_member(message)
       sender = member(message.from) # NB: records member if not seen before
       case message.type
       when :ping
-        @ack_responder.schedule_ack(message.from)
+        @me.schedule_ack(message.from)
       when :ack
         sender.replied_with_ack
       when :ping_req
@@ -21,10 +20,6 @@ module Gossip
         member(target_id).forward_ping(message.from)
       end
       update_suspicions(message.payload[:updates])
-    end
-
-    def update_suspicions(updates)
-      # TODO
     end
 
     def update_members(elapsed_seconds)
@@ -37,16 +32,14 @@ module Gossip
 
     def prepare_output
       update_entries = @members.map { |_k, member| member.prepare_update_entry }
-                               .sort_by { |entry| 100 - entry.propagation_count }
+                               .sort_by { |entry| 100 - entry.incarnation_number }
                                .group_by(&:status)
-                               .then { |groups| Array.new(10, nil).zip(*groups.values) }
+                               .then { |groups| Array.new(10 / 3 + 1, nil).zip(*groups.values) }
                                .flatten
                                .compact
                                .take(10) # TODO: constant
 
-      update_entries.each do |entry|
-        member(entry.member_id).increment_propagation_count
-      end
+      update_entries << @alive_responder.prepare_update_entry
 
       x = @members.values
       x << @ack_responder
@@ -74,8 +67,24 @@ module Gossip
 
     private
 
+    def update_suspicions(updates)
+      updates.each do |entry|
+        if entry.member_id == @my_id
+          @alive_responder.increment_incarnation_number
+        end
+
+        m = member(entry.member_id)
+        i = entry.incarnation_number
+        case entry.status
+        when :suspected then m.suspect(i)
+        when :alive then m.mark_as_alive(i)
+        when :confirmed then m.confirm
+        end
+      end
+    end
+
     def member(id)
-      @members[id] ||= Member.new(id, self)
+      @members[id] ||= Member::Peer.new(id, self)
     end
   end
 end

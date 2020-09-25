@@ -2,10 +2,11 @@
 
 module Gossip
   class ProtocolState
-    def initialize(t_ms, r_ms, seed_member_ids)
+    def initialize(node_member_id, seed_member_ids, t_ms, r_ms)
       @t_ms = t_ms
       @r_ms = r_ms
-      @member_pool = MemberPool.new(seed_member_ids)
+      @member_pool = MemberPool.new(node_member_id, seed_member_ids)
+      @node_member_id = node_member_id
       @t = @r = 1
     end
 

@@ -1,5 +1,5 @@
 RSpec.describe Gossip::ProtocolState do
-  subject { described_class.new(Gossip::T_MS, Gossip::R_MS, []) }
+  subject { described_class.new('me', [], Gossip::T_MS, Gossip::R_MS) }
   it 'can be instantiated' do
     expect(subject).to be_a(described_class)
   end

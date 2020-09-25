@@ -3,9 +3,9 @@
 module Gossip
   module Protocol
     class Base
-      def initialize(pipe, seed_member_ids, t_ms, r_ms)
+      def initialize(pipe, node_member_id, seed_member_ids, t_ms, r_ms)
         @pipe = pipe
-        @state = ProtocolState.new(t_ms, r_ms, seed_member_ids)
+        @state = ProtocolState.new(node_member_id, seed_member_ids, t_ms, r_ms)
       end
 
       def run

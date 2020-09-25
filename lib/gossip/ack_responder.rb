@@ -2,17 +2,18 @@
 
 module Gossip
   class AckResponder
-    def initialize
+    def initialize(id)
+      @id = id
       @pending = []
     end
 
     def schedule_ack(member_id)
-      @pending << member_id
+      @pending << Message.new(member_id, @id, :ack)
     end
 
     def prepare_output
-      result = @pending.map { |member_id| Message::Outbound.new(member_id, :ack) }
-      @pending.clear
+      result = @pending
+      @pending = []
       result
     end
   end
