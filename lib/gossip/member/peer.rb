@@ -6,16 +6,16 @@ module Gossip
       def initialize(id, member_pool)
         super(id)
         @member_pool = member_pool
-        @state = MemberState::Init.new(id, member_pool)
+        @state = State::Alive.new(id, member_pool)
       end
 
       # call this when you wish to send a ping message to member
       def ping
-        @state = MemberState::BeforePing.new(@id, @member_pool)
+        @state = State::BeforePing.new(@id, @member_pool)
       end
 
       def ping_request(target_id)
-        @state = MemberState::BeforePingRequest.new(@id, @member_pool, target_id)
+        @state = State::BeforePingRequest.new(@id, @member_pool, target_id)
       end
 
       def healthy?
@@ -28,7 +28,7 @@ module Gossip
       end
 
       def forward_ping(source_id)
-        @state = MemberState::BeforeForwardedPing.new(@id, @member_pool, source_id)
+        @state = State::BeforeForwardedPing.new(@id, @member_pool, source_id)
       end
 
       def update(elapsed_seconds)

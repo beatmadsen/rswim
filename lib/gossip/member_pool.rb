@@ -3,6 +3,7 @@
 module Gossip
   class MemberPool
     def initialize(node_member_id, seed_member_ids)
+      seed_member_ids = seed_member_ids - [node_member_id]
       @me = Member::Me(node_member_id)
       @members = { node_member_id: @me }
       seed_member_ids.each { |id| member(id) }
@@ -32,18 +33,12 @@ module Gossip
 
     def prepare_output
       update_entries = @members.map { |_k, member| member.prepare_update_entry }
-                               .sort_by { |entry| 100 - entry.incarnation_number }
-                               .group_by(&:status)
-                               .then { |groups| Array.new(10 / 3 + 1, nil).zip(*groups.values) }
-                               .flatten
-                               .compact
+                               .sort_by { |entry| 100 - entry.propagation_count }
                                .take(10) # TODO: constant
 
-      update_entries << @alive_responder.prepare_update_entry
+      update_entries.each { |u| member(u.member_id).increment_propagation_count }
 
-      x = @members.values
-      x << @ack_responder
-      ms = x.flat_map(&:prepare_output)
+      ms = @members.values.flat_map(&:prepare_output)
       ms.each { |message| message.payload[:updates] = update_entries }
       ms
     end
@@ -68,18 +63,8 @@ module Gossip
     private
 
     def update_suspicions(updates)
-      updates.each do |entry|
-        if entry.member_id == @my_id
-          @alive_responder.increment_incarnation_number
-        end
-
-        m = member(entry.member_id)
-        i = entry.incarnation_number
-        case entry.status
-        when :suspected then m.suspect(i)
-        when :alive then m.mark_as_alive(i)
-        when :confirmed then m.confirm
-        end
+      updates.each do |u|
+        member(u.member_id).update_suspicion(u.status, u.incarnation_number)
       end
     end
 
