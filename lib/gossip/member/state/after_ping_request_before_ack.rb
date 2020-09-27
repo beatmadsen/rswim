@@ -18,7 +18,7 @@ module Gossip
 
         def advance(elapsed_seconds)
           @life_time_seconds += elapsed_seconds
-          if @done || @life_time_seconds > R_MS / 1000.0 then Alive.new(@id, @node_member_id, @member_pool)
+          if @done || @life_time_seconds > R_MS / 1000.0 then Alive.new(@id, @node_member_id, @member_pool, @update_entry)
           else self
           end
         end

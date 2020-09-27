@@ -17,7 +17,7 @@ module Gossip
 
         def advance(elapsed_seconds)
           @life_time_seconds += elapsed_seconds
-          if @done then AfterForwardedPingAfterAck.new(@id, @node_member_id, @member_pool, @source_id)
+          if @done then AfterForwardedPingAfterAck.new(@id, @node_member_id, @member_pool, @update_entry, @source_id)
           elsif @life_time_seconds > R_MS / 1000.0 then Suspected.new(@id, @node_member_id, @member_pool, @update_entry, false)
           else self
           end

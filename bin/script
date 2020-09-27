@@ -3,8 +3,9 @@ require "bundler/setup"
 require 'gossip'
 puts "Ruby version: #{RUBY_VERSION}"
 
+me = 'me'
 pipe = Gossip::Pipe.simple
-protocol = Gossip::Protocol::SleepBased.new(pipe, ['root-1', 'root-2'])
+protocol = Gossip::Protocol::SleepBased.new(pipe, me, ['root-1', 'root-2'])
 
 # Protocol thread
 Thread.new do
@@ -15,7 +16,7 @@ end
 Thread.new do
   loop do
     message = pipe.q_out.pop
-    puts "Message for #{message.to}: '#{message.type}'"
+    puts "Message from #{message.from} to #{message.to}: '#{message.type}'"
   end
 end
 
@@ -29,7 +30,7 @@ begin
     ary = input.strip.split(' ')
     type = ary[1].gsub(/-/, "_").to_sym
     payload = { target_id: ary[2] } if type == :ping_req
-    message = Gossip::Message::Inbound.new(ary[0], type, payload)
+    message = Gossip::Message.new(me, ary[0], type, payload)
 
     pipe.q_in << message
   end

@@ -13,5 +13,9 @@ module Gossip
     def increment_propagation_count
       @propagation_count += 1
     end
+
+    def to_s
+      'Doritos'
+    end
   end
 end

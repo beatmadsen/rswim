@@ -22,19 +22,11 @@ class Bus
     end
 
     def send(message)
-      message.payload[:bus_to] = message.to
-      message.payload[:bus_from] = @participant
       @bus.send(message)
     end
 
     def inbound
-      @bus.fetch_messages_for(@participant).map do |outbound|
-        Gossip::Message::Inbound.new(
-          outbound.payload[:bus_from],
-          outbound.type,
-          outbound.payload
-        )
-      end
+      @bus.fetch_messages_for(@participant)
     end
   end
 end

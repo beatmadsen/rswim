@@ -5,7 +5,7 @@ module Gossip
     class << self
 
       def print(members)
-        b = members.map { |k, m| "#{k}: #{m.health}\n" }.join
+        b = members.map { |k, m| "#{k}: #{m.prepare_update_entry.status}\n" }.join
         a = <<~REPORT
 
         ====================================

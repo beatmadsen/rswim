@@ -8,7 +8,7 @@ module Gossip
           @send_ping_request = send_ping_request
           @ping_request_sent = false
           @received_ack = false
-          ue = update_entry.state == :suspected ? update_entry :
+          ue = update_entry.status == :suspected ? update_entry :
                  UpdateEntry.new(id, :suspected, update_entry.incarnation_number, 0)
 
           super(id, node_member_id, member_pool, ue)
@@ -40,10 +40,6 @@ module Gossip
 
         def transition_on_forward_ping(source_id)
           State::BeforeForwardedPing.new(@id, @node_member_id, @member_pool, @update_entry, source_id)
-        end
-
-        def health
-          'suspected'
         end
       end
     end

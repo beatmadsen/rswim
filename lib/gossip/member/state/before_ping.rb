@@ -12,7 +12,7 @@ module Gossip
         def member_replied_with_ack; end
 
         def advance(_elapsed_seconds)
-          if @done then AfterPingBeforeAck.new(@id, @node_member_id, @member_pool)
+          if @done then AfterPingBeforeAck.new(@id, @node_member_id, @member_pool, @update_entry)
           else self
           end
         end

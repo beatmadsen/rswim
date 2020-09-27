@@ -6,7 +6,7 @@ module Gossip
       seed_member_ids = seed_member_ids - [node_member_id]
       @node_member_id = node_member_id
       @me = Member::Me.new(node_member_id)
-      @members = { node_member_id: @me }
+      @members = { node_member_id => @me }
       seed_member_ids.each { |id| member(id) }
     end
 
@@ -21,7 +21,8 @@ module Gossip
         target_id = message.payload[:target_id]
         member(target_id).forward_ping(message.from)
       end
-      update_suspicions(message.payload[:updates])
+      updates = message.payload[:updates]
+      update_suspicions(updates) unless updates.nil?
     end
 
     def update_members(elapsed_seconds)
@@ -45,7 +46,7 @@ module Gossip
     end
 
     def ping_random_healthy_member
-      ms = @members.values.select(&:healthy?)
+      ms = @members.values.select(&:can_be_pinged?)
       return if ms.empty?
 
       index = ms.one? ? 0 : rand(ms.size)
@@ -54,7 +55,7 @@ module Gossip
     end
 
     def ping_request_to_k_members(target_id)
-      @members.values.select(&:healthy?).take(K).each { |m| m.ping_request(target_id) }
+      @members.values.select(&:can_be_pinged?).take(K).each { |m| m.ping_request(target_id) }
     end
 
     def indirect_ack(target_id)

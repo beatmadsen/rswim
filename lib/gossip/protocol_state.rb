@@ -18,7 +18,7 @@ module Gossip
       @r = 0 if @r >= @r_ms
 
       input_messages.each do |message|
-        raise 'message must be of type Message::Inbound' unless message.is_a? Message::Inbound
+        raise 'message must be of type Message' unless message.is_a? Message
 
         update_member(message)
       end
@@ -41,8 +41,8 @@ module Gossip
 
     def update_member(message)
       @member_pool.update_member(message)
-    rescue StandardError => e
-      logger.error(e)
+    # rescue StandardError => e
+    #   logger.error(e)
     end
   end
 end

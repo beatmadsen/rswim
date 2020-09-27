@@ -28,8 +28,8 @@ module Gossip
     end
 
     class SleepBased < Base
-      def initialize(pipe, seed_member_ids, sleep_time_seconds = 0.1, t_ms = T_MS, r_ms = R_MS)
-        super(pipe, seed_member_ids, t_ms, r_ms)
+      def initialize(pipe, node_member_id, seed_member_ids, sleep_time_seconds = 0.1, t_ms = T_MS, r_ms = R_MS)
+        super(pipe, node_member_id, seed_member_ids, t_ms, r_ms)
         @sleep_time_seconds = sleep_time_seconds
       end
 

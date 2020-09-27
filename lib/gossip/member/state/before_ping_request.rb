@@ -11,7 +11,7 @@ module Gossip
         end
 
         def advance(_elapsed_seconds)
-          if @done then AfterPingRequestBeforeAck.new(@id, @node_member_id, @member_pool, @target_id)
+          if @done then AfterPingRequestBeforeAck.new(@id, @node_member_id, @member_pool, @update_entry, @target_id)
           else self
           end
         end

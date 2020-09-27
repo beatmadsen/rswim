@@ -5,7 +5,7 @@ class Agent
     @seed_member_ids = ('a' .. 'z').to_a
     @protocols = @seed_member_ids.map do |x|
       pipe = Bus::Pipe.new(x, @bus)
-      SimulatedPauseProtocol.new(p, x, @seed_member_ids)
+      SimulatedPauseProtocol.new(pipe, x, @seed_member_ids)
     end
   end
 

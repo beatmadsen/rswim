@@ -16,8 +16,8 @@ module Gossip
           end
         end
 
-        def health
-          'alive'
+        def can_be_pinged?
+          true
         end
 
         def update_suspicion(status, incarnation_number)

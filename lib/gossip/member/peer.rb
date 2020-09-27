@@ -18,10 +18,6 @@ module Gossip
         @state = @state.transition_on_ping_request(target_id)
       end
 
-      def healthy?
-        health == 'alive'
-      end
-
       #  call this when you received ack from member
       def replied_with_ack
         @state.member_replied_with_ack
@@ -51,8 +47,8 @@ module Gossip
         @state = @state.update_suspicion(status, incarnation_number)
       end
 
-      def health
-        @state.health
+      def can_be_pinged?
+        @state.can_be_pinged?
       end
     end
   end

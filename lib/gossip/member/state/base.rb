@@ -40,6 +40,10 @@ module Gossip
           @update_entry.increment_propagation_count
         end
 
+        def can_be_pinged?
+          false
+        end
+
         private
 
         def logger

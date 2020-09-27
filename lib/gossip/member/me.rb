@@ -32,13 +32,13 @@ module Gossip
       end
 
       def prepare_update_entry
-        UpdateEntry.new(@id, :alive, @incarnation_number)
+        UpdateEntry.new(@id, :alive, @incarnation_number, @propagation_count)
       end
 
       def update(elapsed_seconds); end
 
-      def health
-        'alive'
+      def can_be_pinged?
+        false
       end
     end
   end
