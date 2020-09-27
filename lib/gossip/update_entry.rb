@@ -9,4 +9,8 @@ class UpdateEntry
     @incarnation_number = incarnation_number
     @propagation_count = propagation_count
   end
+
+  def increment_propagation_count
+    @propagation_count += 1
+  end
 end

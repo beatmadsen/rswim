@@ -4,21 +4,21 @@ module Gossip
   module Member
     module State
       class AfterForwardedPingAfterAck < Base
-        def initialize(id, member_pool, source_id)
+        def initialize(id, node_member_id, member_pool, update_entry, source_id)
           @source_id = source_id
           @done = false
-          super(id, member_pool)
+          super(id, node_member_id, member_pool, update_entry)
         end
 
         def advance(_elapsed_seconds)
-          if @done then Alive.new(@id, @member_pool)
+          if @done then Alive.new(@id, @node_member_id, @member_pool)
           else self
           end
         end
 
         def prepare_output
           @done = true
-          message = Message::Outbound.new(@source_id, :ack)
+          message = Message.new(@source_id, @node_member_id, :ack)
           [message]
         end
 

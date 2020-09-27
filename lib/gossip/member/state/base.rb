@@ -4,10 +4,14 @@ module Gossip
   module Member
     module State
       class Base
-        def initialize(id, member_pool)
+        attr_reader :update_entry
+
+        def initialize(id, node_member_id, member_pool, update_entry)
           logger.debug("Member with id #{id} entered new state")
           @member_pool = member_pool
           @id = id
+          @node_member_id = node_member_id
+          @update_entry = update_entry
         end
 
         def member_replied_with_ack; end
@@ -20,7 +24,23 @@ module Gossip
           []
         end
 
-          private
+        def transition_on_ping
+          raise 'called at unexpected time'
+        end
+
+        def transition_on_ping_request(target_id)
+          raise 'called at unexpected time'
+        end
+
+        def transition_on_forward_ping(source_id)
+          raise 'called at unexpected time'
+        end
+
+        def increment_propagation_count
+          @update_entry.increment_propagation_count
+        end
+
+        private
 
         def logger
           @_logger ||= begin

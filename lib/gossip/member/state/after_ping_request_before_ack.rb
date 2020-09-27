@@ -4,11 +4,11 @@ module Gossip
   module Member
     module State
       class AfterPingRequestBeforeAck < Base
-        def initialize(id, member_pool, target_id)
+        def initialize(id, node_member_id, member_pool, update_entry, target_id)
           @target_id = target_id
           @life_time_seconds = 0
           @done = false
-          super(id, member_pool)
+          super(id, node_member_id, member_pool, update_entry)
         end
 
         def member_replied_with_ack
@@ -18,7 +18,7 @@ module Gossip
 
         def advance(elapsed_seconds)
           @life_time_seconds += elapsed_seconds
-          if @done || @life_time_seconds > R_MS / 1000.0 then Alive.new(@id, @member_pool)
+          if @done || @life_time_seconds > R_MS / 1000.0 then Alive.new(@id, @node_member_id, @member_pool)
           else self
           end
         end

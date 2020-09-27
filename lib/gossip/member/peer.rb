@@ -11,11 +11,11 @@ module Gossip
 
       # call this when you wish to send a ping message to member
       def ping
-        @state = State::BeforePing.new(@id, @member_pool)
+        @state = @state.transition_on_ping
       end
 
       def ping_request(target_id)
-        @state = State::BeforePingRequest.new(@id, @member_pool, target_id)
+        @state = @state.transition_on_ping_request(target_id)
       end
 
       def healthy?
@@ -28,7 +28,7 @@ module Gossip
       end
 
       def forward_ping(source_id)
-        @state = State::BeforeForwardedPing.new(@id, @member_pool, source_id)
+        @state = @state.transition_on_forward_ping(source_id)
       end
 
       def update(elapsed_seconds)
@@ -40,7 +40,15 @@ module Gossip
       end
 
       def prepare_update_entry
-        @state.prepare_update_entry
+        @state.update_entry
+      end
+
+      def increment_propagation_count
+        @state.increment_propagation_count
+      end
+
+      def update_suspicion(status, incarnation_number)
+        @state = @state.update_suspicion(status, incarnation_number)
       end
 
       def health

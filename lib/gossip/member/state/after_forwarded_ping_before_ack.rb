@@ -4,11 +4,11 @@ module Gossip
   module Member
     module State
       class AfterForwardedPingBeforeAck < Base
-        def initialize(id, member_pool, source_id)
+        def initialize(id, node_member_id, member_pool, update_entry, source_id)
           @source_id = source_id
           @life_time_seconds = 0
           @done = false
-          super(id, member_pool)
+          super(id, node_member_id, member_pool, update_entry)
         end
 
         def member_replied_with_ack
@@ -17,8 +17,8 @@ module Gossip
 
         def advance(elapsed_seconds)
           @life_time_seconds += elapsed_seconds
-          if @done then AfterForwardedPingAfterAck.new(@id, @member_pool, @source_id)
-          elsif @life_time_seconds > R_MS / 1000.0 then Suspected.new(@id, @member_pool, false)
+          if @done then AfterForwardedPingAfterAck.new(@id, @node_member_id, @member_pool, @source_id)
+          elsif @life_time_seconds > R_MS / 1000.0 then Suspected.new(@id, @node_member_id, @member_pool, @update_entry, false)
           else self
           end
         end

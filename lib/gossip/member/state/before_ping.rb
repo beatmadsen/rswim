@@ -4,7 +4,7 @@ module Gossip
   module Member
     module State
       class BeforePing < Base
-        def initialize(id, member_pool)
+        def initialize(id, node_member_id, member_pool, update_entry)
           @done = false
           super
         end
@@ -12,14 +12,14 @@ module Gossip
         def member_replied_with_ack; end
 
         def advance(_elapsed_seconds)
-          if @done then AfterPingBeforeAck.new(@id, @member_pool)
+          if @done then AfterPingBeforeAck.new(@id, @node_member_id, @member_pool)
           else self
           end
         end
 
         def prepare_output
           @done = true
-          message = Message::Outbound.new(@id, :ping)
+          message = Message.new(@id, @node_member_id, :ping)
           [message]
         end
 
