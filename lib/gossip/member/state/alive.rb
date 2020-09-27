@@ -20,10 +20,6 @@ module Gossip
           true
         end
 
-        def update_suspicion(status, incarnation_number)
-          self # TODO
-        end
-
         def transition_on_ping
           State::BeforePing.new(@id, @node_member_id, @member_pool, @update_entry)
         end
