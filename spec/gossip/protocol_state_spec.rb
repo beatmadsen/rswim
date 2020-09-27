@@ -19,7 +19,7 @@ RSpec.describe Gossip::ProtocolState do
   context 'with single incoming ping from member' do
     context 'after first tick' do
       let!(:out1) do
-        subject.advance([Gossip::Message::Inbound.new('a', :ping)], 0)
+        subject.advance([Gossip::Message.new('me', 'a', :ping)], 0)
       end
       let!(:ack_message) { out1.first }
 
@@ -47,7 +47,7 @@ RSpec.describe Gossip::ProtocolState do
 
   context 'with multiple members and one suspected' do
     before do
-      inputs = ('a'..'z').map { |member| Gossip::Message::Inbound.new(member, :ping) }
+      inputs = ('a'..'z').map { |member| Gossip::Message.new('me', member, :ping) }
       subject.advance(inputs, 0)
       subject.advance([], Gossip::T_MS / 1000.0)
       subject.advance([], 0)

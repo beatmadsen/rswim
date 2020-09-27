@@ -3,8 +3,10 @@ class Agent
   def initialize
     @bus = Bus.new
     @seed_member_ids = ('a' .. 'z').to_a
-    @pipes = @seed_member_ids.map { |x| Bus::Pipe.new(x, @bus) }
-    @protocols = @pipes.map { |p| SimulatedPauseProtocol.new(p, @seed_member_ids) }
+    @protocols = @seed_member_ids.map do |x|
+      pipe = Bus::Pipe.new(x, @bus)
+      SimulatedPauseProtocol.new(p, x, @seed_member_ids)
+    end
   end
 
   def run

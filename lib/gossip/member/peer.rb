@@ -3,10 +3,10 @@
 module Gossip
   module Member
     class Peer < Base
-      def initialize(id, member_pool)
+      def initialize(id, node_member_id, member_pool)
         super(id)
         @member_pool = member_pool
-        @state = State::Alive.new(id, member_pool)
+        @state = State::Alive.new(id, node_member_id, member_pool)
       end
 
       # call this when you wish to send a ping message to member

@@ -7,12 +7,12 @@ module Gossip
         def initialize(id, node_member_id, member_pool, update_entry = nil)
           if update_entry.nil?
             ue = UpdateEntry.new(id, :alive, 0, 0)
-            super(id, node_member_id, member, ue)
+            super(id, node_member_id, member_pool, ue)
           elsif update_entry.status == :alive
             super
           else
             ue = UpdateEntry.new(id, :alive, update_entry.incarnation_number, 0)
-            super(id, node_member_id, member, ue)
+            super(id, node_member_id, member_pool, ue)
           end
         end
 

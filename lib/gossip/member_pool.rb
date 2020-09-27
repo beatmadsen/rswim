@@ -4,7 +4,8 @@ module Gossip
   class MemberPool
     def initialize(node_member_id, seed_member_ids)
       seed_member_ids = seed_member_ids - [node_member_id]
-      @me = Member::Me(node_member_id)
+      @node_member_id = node_member_id
+      @me = Member::Me.new(node_member_id)
       @members = { node_member_id: @me }
       seed_member_ids.each { |id| member(id) }
     end
@@ -69,7 +70,7 @@ module Gossip
     end
 
     def member(id)
-      @members[id] ||= Member::Peer.new(id, self)
+      @members[id] ||= Member::Peer.new(id, @node_member_id, self)
     end
   end
 end
