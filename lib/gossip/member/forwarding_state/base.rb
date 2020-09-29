@@ -14,10 +14,6 @@ module Gossip
 
         def forward_ack_to_member; end
 
-        def reset; end
-
-        def member_replied_in_time; end
-
         def advance(_elapsed_seconds)
           self
         end

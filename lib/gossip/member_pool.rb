@@ -3,7 +3,7 @@
 module Gossip
   class MemberPool
     def initialize(node_member_id, seed_member_ids)
-      seed_member_ids = seed_member_ids - [node_member_id]
+      seed_member_ids -= [node_member_id]
       @node_member_id = node_member_id
       @me = Member::Me.new(node_member_id)
       @members = { node_member_id => @me }
@@ -19,7 +19,7 @@ module Gossip
         sender.replied_with_ack
       when :ping_req
         target_id = message.payload[:target_id]
-        member(target_id).forward_ping(message.from)
+        member(target_id).ping_from!(message.from)
       end
       updates = message.payload[:updates]
       update_suspicions(updates) unless updates.nil?
@@ -45,28 +45,31 @@ module Gossip
       ms
     end
 
-    def ping_random_healthy_member
+    def send_ping_to_random_healthy_member
       ms = @members.values.select(&:can_be_pinged?)
       return if ms.empty?
 
       index = ms.one? ? 0 : rand(ms.size)
       member = ms[index]
-      member.ping
+      member.ping!
     end
 
-    def ping_request_to_k_members(target_id)
-      @members.values.select(&:can_be_pinged?).take(K).each { |m| m.ping_request(target_id) }
+    def send_ping_request_to_k_members(target_id)
+      @members.values
+              .select(&:can_be_pinged?)
+              .take(K)
+              .each { |m| m.ping_request!(target_id) }
     end
 
-    def indirect_ack(member_id)
-      member(member_id).replied_with_ack
+    def forward_ack_to(member_id)
+      member(member_id).forward_ack
     end
 
-    def replied_in_time(member_id)
+    def member_replied_in_time(member_id)
       member(member_id).replied_in_time
     end
 
-    def failed_to_reply(member_id)
+    def member_failed_to_reply(member_id)
       member(member_id).failed_to_reply
     end
 

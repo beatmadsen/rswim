@@ -13,10 +13,6 @@ module Gossip
           @activated = true
         end
 
-        def member_replied_in_time
-          log.debug("out of order ack from member #{@id}")
-        end
-
         def advance(_elapsed_seconds)
           if @activated then AwaitingAck.new(@id, @node_member_id)
           else self

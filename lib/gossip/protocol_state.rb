@@ -34,7 +34,7 @@ module Gossip
         output_messages.concat(@member_pool.prepare_output)
       end
 
-      @member_pool.ping_random_healthy_member if @t == 0
+      @member_pool.send_ping_to_random_healthy_member if @t == 0
 
       3.times do
         @member_pool.update_members(0)

@@ -27,7 +27,7 @@ module Gossip
           @source_ids << @id
         end
 
-        def enqueue_forward_ping(source_id)
+        def enqueue_ping_from(source_id)
           @source_ids << source_id
         end
 

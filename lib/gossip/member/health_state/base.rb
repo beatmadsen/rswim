@@ -14,8 +14,6 @@ module Gossip
           @update_entry = update_entry
         end
 
-        def member_replied_with_ack; end
-
         def advance(_elapsed_seconds)
           self
         end
