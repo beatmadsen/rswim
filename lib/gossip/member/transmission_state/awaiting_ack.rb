@@ -12,7 +12,7 @@ module Gossip
 
         def member_replied_with_ack
           if @source_ids.include?(@id)
-            @member_pool.replied_in_time(@id)
+            @member_pool.member_replied_in_time(@id)
           end
           @source_ids.each { |i| @member_pool.forward_ack_to(i) unless i == @id }
           @source_ids.clear

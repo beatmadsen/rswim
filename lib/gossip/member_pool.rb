@@ -11,6 +11,9 @@ module Gossip
     end
 
     def update_member(message)
+      updates = message.payload[:updates]
+      update_suspicions(updates) unless updates.nil?
+
       sender = member(message.from) # NB: records member if not seen before
       case message.type
       when :ping
@@ -21,8 +24,6 @@ module Gossip
         target_id = message.payload[:target_id]
         member(target_id).ping_from!(message.from)
       end
-      updates = message.payload[:updates]
-      update_suspicions(updates) unless updates.nil?
     end
 
     def update_members(elapsed_seconds)

@@ -7,7 +7,7 @@ module Gossip
         super(id)
         @member_pool = member_pool
         @transmission_state = TransmissionState::Ready.new(id, node_member_id, member_pool)
-        @health_state = HealthState::Alive.new(id, node_member_id, member_pool)
+        @health_state = HealthState::Alive.new(id, member_pool)
         @forwarding_state = ForwardingState::Ready.new(id, node_member_id)
       end
 
@@ -41,7 +41,7 @@ module Gossip
       end
 
       def failed_to_reply
-        update_suspicion(:suspected)
+        @health_state.member_failed_to_reply
       end
 
       def forward_ack

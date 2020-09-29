@@ -14,7 +14,7 @@ module Gossip
         end
 
         def advance(_elapsed_seconds)
-          if @activated then AwaitingAck.new(@id, @node_member_id)
+          if @activated then ForwardingAck.new(@id, @node_member_id)
           else self
           end
         end

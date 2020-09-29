@@ -6,8 +6,6 @@ module Gossip
       class Base
         def initialize(id, node_member_id)
           logger.debug("Member with id #{id} entered new state: #{self.class}")
-          @member_pool = member_pool
-          # We are forwarding acks to this member
           @id = id
           @node_member_id = node_member_id
         end

@@ -6,11 +6,10 @@ module Gossip
       class Base
         attr_reader :update_entry
 
-        def initialize(id, node_member_id, member_pool, update_entry)
+        def initialize(id, member_pool, update_entry)
           logger.debug("Member with id #{id} entered new state: #{self.class}")
           @member_pool = member_pool
           @id = id
-          @node_member_id = node_member_id
           @update_entry = update_entry
         end
 
@@ -24,25 +23,28 @@ module Gossip
           i0 = @update_entry.incarnation_number
           case status
           when :confirmed
-            Confirmed.new(@id, incarnation_number)
+            ue = UpdateEntry.new(@id, status, incarnation_number, 0)
+            Confirmed.new(@id, @member_pool, ue)
           when :suspected
             if (s0 == :suspected && incarnation_number > i0) ||
-              (s0 == :alive && incarnation_number >= i0)
+               (s0 == :alive && incarnation_number >= i0)
               ue = UpdateEntry.new(@id, status, incarnation_number, 0)
-              Suspected.new(@id, @node_member_id, @member_pool, ue, false)
+              Suspected.new(@id, @member_pool, ue, false)
             else
               self
             end
           when :alive
             if (s0 == :suspected && incarnation_number > i0) ||
-              (s0 == :alive && incarnation_number > i0)
+               (s0 == :alive && incarnation_number > i0)
               ue = UpdateEntry.new(@id, status, incarnation_number, 0)
-              Alive.new(@id, @node_member_id, @member_pool, ue)
+              Alive.new(@id, @member_pool, ue)
             else
               self
             end
           end
         end
+
+        def member_failed_to_reply; end
 
         def increment_propagation_count
           @update_entry.increment_propagation_count
