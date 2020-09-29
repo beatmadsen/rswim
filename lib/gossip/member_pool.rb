@@ -58,8 +58,16 @@ module Gossip
       @members.values.select(&:can_be_pinged?).take(K).each { |m| m.ping_request(target_id) }
     end
 
-    def indirect_ack(target_id)
-      @members[target_id].replied_with_ack
+    def indirect_ack(member_id)
+      member(member_id).replied_with_ack
+    end
+
+    def replied_in_time(member_id)
+      member(member_id).replied_in_time
+    end
+
+    def failed_to_reply(member_id)
+      member(member_id).failed_to_reply
     end
 
     private

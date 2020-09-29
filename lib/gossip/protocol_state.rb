@@ -24,10 +24,23 @@ module Gossip
       end
 
       @member_pool.update_members(elapsed_seconds)
-
       output_messages = @member_pool.prepare_output
 
+      # TODO: more deterministic steady state mechanism,
+      # e.g. output_messages = @member_pool.next_steady_state(elapsed_seconds)
+      # using a flag set by member state
+      3.times do
+        @member_pool.update_members(0)
+        output_messages.concat(@member_pool.prepare_output)
+      end
+
       @member_pool.ping_random_healthy_member if @t == 0
+
+      3.times do
+        @member_pool.update_members(0)
+        output_messages.concat(@member_pool.prepare_output)
+      end
+
       @member_pool.status_report if @r == 0
 
       output_messages
