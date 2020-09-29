@@ -36,6 +36,7 @@ module Gossip
 
     def prepare_output
       update_entries = @members.map { |_k, member| member.prepare_update_entry }
+                               .select { |entry| entry.propagation_count < 5 }
                                .sort_by { |entry| 100 - entry.propagation_count }
                                .take(10) # TODO: constant
 
@@ -66,6 +67,15 @@ module Gossip
       member(member_id).forward_ack
     end
 
+    def halt_member(member_id)
+      member(member_id).halt
+    end
+
+    def remove_member(member_id)
+      raise 'boom' if member_id == @node_member_id
+      @members.delete(member_id)
+    end
+
     def member_replied_in_time(member_id)
       member(member_id).replied_in_time
     end
@@ -83,6 +93,7 @@ module Gossip
     end
 
     def member(id)
+      raise 'boom' if id.nil?
       @members[id] ||= Member::Peer.new(id, @node_member_id, self)
     end
   end

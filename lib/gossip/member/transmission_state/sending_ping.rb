@@ -13,7 +13,6 @@ module Gossip
           log.debug("out of order ack from member #{@id}")
         end
 
-
         def advance(_elapsed_seconds)
           if @done then AwaitingAck.new(@id, @node_member_id, @member_pool, @source_ids, @target_ids)
           else self

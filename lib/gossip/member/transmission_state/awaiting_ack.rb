@@ -25,7 +25,7 @@ module Gossip
             Ready.new(@id, @node_member_id, @member_pool, @source_ids, @target_ids)
           elsif @life_time_seconds > R_MS / 1000.0
             if @source_ids.include?(@id)
-              @member_pool.failed_to_reply(@id)
+              @member_pool.member_failed_to_reply(@id)
             end
             Ready.new(@id, @node_member_id, @member_pool, @source_ids, @target_ids)
           else

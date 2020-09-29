@@ -1,6 +1,6 @@
-RSpec.describe Gossip::Protocol do
+RSpec.describe Gossip::Agent do
   context 'when many talk together' do
-    subject { Agent.new }
+    subject { Simulation.new }
     it "will continue" do
       subject.run
     end

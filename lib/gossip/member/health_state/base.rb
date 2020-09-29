@@ -7,10 +7,10 @@ module Gossip
         attr_reader :update_entry
 
         def initialize(id, member_pool, update_entry)
-          logger.debug("Member with id #{id} entered new state: #{self.class}")
           @member_pool = member_pool
           @id = id
           @update_entry = update_entry
+          logger.debug("Member with id #{id} entered new state: #{self.class}")
         end
 
         def advance(_elapsed_seconds)
@@ -23,8 +23,12 @@ module Gossip
           i0 = @update_entry.incarnation_number
           case status
           when :confirmed
-            ue = UpdateEntry.new(@id, status, incarnation_number, 0)
-            Confirmed.new(@id, @member_pool, ue)
+            if (s0 == :confirmed)
+              self
+            else
+              ue = UpdateEntry.new(@id, status, incarnation_number, 0)
+              Confirmed.new(@id, @member_pool, ue)
+            end
           when :suspected
             if (s0 == :suspected && incarnation_number > i0) ||
                (s0 == :alive && incarnation_number >= i0)
@@ -58,7 +62,7 @@ module Gossip
 
         def logger
           @_logger ||= begin
-            Gossip::Logger.new(self.class, STDERR)
+            Gossip::Logger.new("unknown node", STDERR)
           end
         end
       end

@@ -22,7 +22,7 @@ module Gossip
         def prepare_output
           @done = true
           target_id = @target_ids.shift
-          message = Message.new(@id, @node_member_id, :ping_req, target_id: @target_id)
+          message = Message.new(@id, @node_member_id, :ping_req, target_id: target_id)
           [message]
         end
       end

@@ -5,9 +5,9 @@ module Gossip
     module ForwardingState
       class Base
         def initialize(id, node_member_id)
-          logger.debug("Member with id #{id} entered new state: #{self.class}")
           @id = id
           @node_member_id = node_member_id
+          logger.debug("Member with id #{id} entered new state: #{self.class}")
         end
 
         def forward_ack_to_member; end
@@ -24,7 +24,7 @@ module Gossip
 
         def logger
           @_logger ||= begin
-            Gossip::Logger.new(self.class, STDERR)
+            Gossip::Logger.new("Node #{@node_member_id}", STDERR)
           end
         end
       end

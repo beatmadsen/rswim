@@ -5,7 +5,7 @@ module Gossip
     module HealthState
       class Suspected < Base
         def initialize(id, member_pool, update_entry, send_ping_request)
-          super
+          super(id, member_pool, update_entry)
           @ping_request_sent = !send_ping_request
           @life_time_seconds = 0
         end
@@ -13,7 +13,7 @@ module Gossip
         def advance(elapsed_seconds)
           @life_time_seconds += elapsed_seconds
           unless @ping_request_sent
-            @member_pool.ping_request_to_k_members(@id)
+            @member_pool.send_ping_request_to_k_members(@id)
             @ping_request_sent = true
           end
           if @life_time_seconds > 60

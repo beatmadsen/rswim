@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Gossip
-  module Protocol
+  module Agent
     class Base
       def initialize(pipe, node_member_id, seed_member_ids, t_ms, r_ms)
         @pipe = pipe

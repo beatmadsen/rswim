@@ -44,6 +44,13 @@ module Gossip
         @health_state.member_failed_to_reply
       end
 
+
+      ## Commands
+
+      def halt
+        @transmission_state = TransmissionState::Off.new(@id)
+      end
+
       def forward_ack
         @forwarding_state.forward_ack_to_member
       end

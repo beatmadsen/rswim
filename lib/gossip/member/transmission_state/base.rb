@@ -5,12 +5,12 @@ module Gossip
     module TransmissionState
       class Base
         def initialize(id, node_member_id, member_pool, source_ids, target_ids)
-          logger.debug("Member with id #{id} entered new state: #{self.class}")
           @member_pool = member_pool
           @id = id
           @node_member_id = node_member_id
           @source_ids = source_ids
           @target_ids = target_ids
+          logger.debug("Member with id #{id} entered new state: #{self.class}")
         end
 
         def member_replied_with_ack; end
@@ -39,7 +39,7 @@ module Gossip
 
         def logger
           @_logger ||= begin
-            Gossip::Logger.new(self.class, STDERR)
+            Gossip::Logger.new("Node #{@node_member_id}", STDERR)
           end
         end
       end
