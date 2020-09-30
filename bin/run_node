@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby --jit
+require "bundler/setup"
+require 'gossip'
+puts "Ruby version: #{RUBY_VERSION}"
+
+PORT = 4545
+
+puts "Starting node"
+
+node = Gossip::Node::Udp.new(PORT)
+node.start
+
+# Input thread (stdin)
+puts "Ready\n"
+begin
+  loop do
+    input = gets
+    break if input.nil?
+    input.strip!
+    puts "read input: #{input}"
+    case input
+    when "start"
+      puts "starting"
+      node.start
+    when "stop"
+      puts "stopping"
+      node.stop
+    end
+  end
+rescue Interrupt
+end
+puts "\nDone"
