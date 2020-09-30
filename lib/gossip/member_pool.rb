@@ -31,14 +31,14 @@ module Gossip
     end
 
     def status_report
-      StatusReport.print(@members)
+      StatusReport.print(@node_member_id, @members)
     end
 
     def prepare_output
       update_entries = @members.map { |_k, member| member.prepare_update_entry }
-                               .select { |entry| entry.propagation_count < 5 }
-                               .sort_by { |entry| 100 - entry.propagation_count }
-                               .take(10) # TODO: constant
+                               # .select { |entry| entry.propagation_count < 5 }
+                               .sort_by { |entry| entry.propagation_count } # sort ascending!
+                               .take(15) # TODO: constant
 
       update_entries.each { |u| member(u.member_id).increment_propagation_count }
 

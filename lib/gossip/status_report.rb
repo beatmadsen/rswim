@@ -4,16 +4,16 @@ module Gossip
   class StatusReport
     class << self
 
-      def print(members)
+      def print(node_member_id, members)
         b = members.map { |k, m| "#{k}: #{m.prepare_update_entry.status}\n" }.join
         a = <<~REPORT
 
-        ====================================
-        Status report:
-        ====================================
+        ==========================================
+        Status report for node #{node_member_id}:
+        ==========================================
 
         #{b}
-        ====================================
+        ==========================================
 
         REPORT
         logger.info(a)

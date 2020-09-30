@@ -4,11 +4,20 @@ class Simulation
 
     @normal_agent_ids = ('a'..'z').to_a
     @non_responsive_agent_ids = %w[mute1 mute2]
-    @seed_member_ids = @normal_agent_ids + @non_responsive_agent_ids
 
     @agents = @normal_agent_ids.map do |x|
       pipe = Bus::Pipe.new(x, @bus)
-      SimulatedPauseAgent.new(pipe, x, @seed_member_ids)
+      SimulatedPauseAgent.new(pipe, x, ['a', 'b'] + @non_responsive_agent_ids)
+    end
+
+    @agents << 'emitter-1'.then do |x|
+      pipe = Bus::Pipe.new(x, @bus)
+      SimulatedPauseAgent.new(pipe, x, ['a'])
+    end
+
+    @agents << 'emitter-2'.then do |x|
+      pipe = Bus::Pipe.new(x, @bus)
+      SimulatedPauseAgent.new(pipe, x, ['b'])
     end
 
     @agents.concat(

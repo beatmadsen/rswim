@@ -5,7 +5,7 @@ class SimulatedPauseAgent < Gossip::Agent::FiberBased
 
   def initialize(pipe, node_member_id, seed_member_ids)
     super(pipe, node_member_id, seed_member_ids, Gossip::T_MS, Gossip::R_MS)
-    @next_pause_seconds = 1
+    @next_pause_seconds = 0.5
   end
 
   protected

@@ -11,7 +11,7 @@ module Gossip
 
         def advance(_elapsed_seconds)
           if @failed_to_reply
-            ue = UpdateEntry.new(@id, :suspected, @update_entry.incarnation_number, 0)
+            ue = UpdateEntry.new(@id, :suspected, @update_entry.incarnation_number, -1)
             Suspected.new(@id, @member_pool, ue, true)
           else
             self

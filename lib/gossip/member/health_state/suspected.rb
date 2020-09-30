@@ -17,7 +17,7 @@ module Gossip
             @ping_request_sent = true
           end
           if @life_time_seconds > 60
-            Confirmed.new(@id, @member_pool, UpdateEntry.new(@id, :confirmed, @update_entry.incarnation_number, 0))
+            Confirmed.new(@id, @member_pool, UpdateEntry.new(@id, :confirmed, @update_entry.incarnation_number, -2))
           else
             self
           end
