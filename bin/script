@@ -5,12 +5,12 @@ puts "Ruby version: #{RUBY_VERSION}"
 
 me = 'me'
 pipe = Gossip::Pipe.simple
-protocol = Gossip::Protocol::SleepBased.new(pipe, me, ['root-1', 'root-2'])
+protocol = Gossip::Agent::SleepBased.new(pipe, me, ['root-1', 'root-2'])
 
 # Protocol thread
-Thread.new do
-  protocol.run
-end
+Thread.new { protocol.run }
+      .abort_on_exception = true
+
 
 # Output thread (stdout)
 Thread.new do
@@ -18,7 +18,7 @@ Thread.new do
     message = pipe.q_out.pop
     puts "Message from #{message.from} to #{message.to}: '#{message.type}'"
   end
-end
+end.abort_on_exception = true
 
 # Input thread (stdin)
 puts "Ready\n"
@@ -29,7 +29,7 @@ begin
     # TODO: Input
     ary = input.strip.split(' ')
     type = ary[1].gsub(/-/, "_").to_sym
-    payload = { target_id: ary[2] } if type == :ping_req
+    payload = type == :ping_req ? { target_id: ary[2] } : {}
     message = Gossip::Message.new(me, ary[0], type, payload)
 
     pipe.q_in << message

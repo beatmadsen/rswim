@@ -23,6 +23,8 @@ module Gossip
       when :ping_req
         target_id = message.payload[:target_id]
         member(target_id).ping_from!(message.from)
+      else
+        raise 'bad message type'
       end
     end
 
@@ -57,7 +59,7 @@ module Gossip
     end
 
     def send_ping_request_to_k_members(target_id)
-      @members.inject([]) { |acc, (id, m)| id != target_id && m.can_be_pinged? ? (acc << m) : acc }               
+      @members.inject([]) { |acc, (id, m)| id != target_id && m.can_be_pinged? ? (acc << m) : acc }
               .take(K)
               .each { |m| m.ping_request!(target_id) }
     end
