@@ -2,13 +2,21 @@ class Simulation
   def initialize
     @bus = Bus.new
 
-    @normal_agent_ids = ('a'..'z').to_a
+
     @non_responsive_agent_ids = %w[mute1 mute2]
 
-    @agents = @normal_agent_ids.map do |x|
+    @agents = ('a'..'d').map do |x|
       pipe = Bus::Pipe.new(x, @bus)
       SimulatedPauseAgent.new(pipe, x, ['a', 'b'] + @non_responsive_agent_ids)
     end
+
+    @agents.concat(
+      (1..20).map do |i|
+        x = "unstable-#{i}"
+        pipe = Bus::IntermittentPipe.new(x, @bus)
+        SimulatedPauseAgent.new(pipe, x, ['a', 'b'] + @non_responsive_agent_ids)
+      end
+    )
 
     @agents << 'emitter-1'.then do |x|
       pipe = Bus::Pipe.new(x, @bus)

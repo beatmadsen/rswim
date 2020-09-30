@@ -57,8 +57,7 @@ module Gossip
     end
 
     def send_ping_request_to_k_members(target_id)
-      @members.values
-              .select(&:can_be_pinged?)
+      @members.inject([]) { |acc, (id, m)| id != target_id && m.can_be_pinged? ? (acc << m) : acc }               
               .take(K)
               .each { |m| m.ping_request!(target_id) }
     end

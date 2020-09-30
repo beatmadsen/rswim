@@ -9,7 +9,7 @@ module Gossip
         end
 
         def member_replied_with_ack
-          log.debug("out of order ack from member #{@id}")
+          logger.debug("out of order ack from member #{@id}")
         end
 
         def advance(_elapsed_seconds)
