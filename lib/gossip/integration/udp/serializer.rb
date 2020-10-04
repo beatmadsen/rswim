@@ -8,7 +8,15 @@ module Gossip
           @directory = directory
         end
 
-        def serialize(message); end
+        def serialize(message)
+          l1 = message.type.to_s.gsub(/_/, '-')
+          l1 << " #{@directory.host(message.payload[:target_id])}" if message.type == :ping_req
+          message.payload[:updates].to_a.each do |update|
+            # host status incarnation_number
+            l1 << "\n#{@directory.host(update.member_id)} #{update.status} #{update.incarnation_number}"
+          end
+          l1
+        end
 
         protected
 

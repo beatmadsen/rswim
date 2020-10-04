@@ -20,7 +20,7 @@ module Gossip
           end
         end
 
-        def host_and_port(id)
+        def host(id)
           @hosts[id]
         end
       end

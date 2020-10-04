@@ -37,10 +37,11 @@ module Gossip
             begin
               # host status incarnation_number
               host, status, incarnation_number = l.strip.split(' ')
-              id = @directory.id(host, port)
+              id = @directory.id(host)
               UpdateEntry.new(id, status.to_sym, incarnation_number.to_i)
             rescue StandardError => e
               logger.debug("Failed to parse line `#{l}`: #{e}")
+              nil
             end
           end.tap(&:compact!)
         end
