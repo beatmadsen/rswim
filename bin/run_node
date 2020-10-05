@@ -14,10 +14,14 @@ puts "Starting node"
 
 node = Gossip::Integration::Udp::Node.new('localhost', hosts, PORT)
 
+node.subscribe do |host, status|
+  puts "Update: #{host} entered state #{status}"
+end
+
 # Input thread (stdin)
 puts "Ready\n"
 begin
-  node.start  
+  node.start
 rescue Interrupt
 end
 puts "\nDone"

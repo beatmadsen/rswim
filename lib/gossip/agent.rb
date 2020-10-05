@@ -8,6 +8,10 @@ module Gossip
         @state = ProtocolState.new(node_member_id, seed_member_ids, t_ms, r_ms)
       end
 
+      def subscribe(&block)
+        @state.subscribe(&block)
+      end
+
       def run
         loop do
           elapsed_seconds = pause

@@ -8,6 +8,7 @@ module Gossip
       @me = Member::Me.new(node_member_id)
       @members = { node_member_id => @me }
       seed_member_ids.each { |id| member(id) }
+      @subscribers = []
     end
 
     def update_member(message)
@@ -36,13 +37,21 @@ module Gossip
       StatusReport.print(@node_member_id, @members)
     end
 
+    def subscribe(&block)
+      @subscribers << block
+    end
+
+
     def prepare_output
       update_entries = @members.map { |_k, member| member.prepare_update_entry }
                                # .select { |entry| entry.propagation_count < 5 }
                                .sort_by { |entry| entry.propagation_count } # sort ascending!
                                .take(15) # TODO: constant
 
-      update_entries.each { |u| member(u.member_id).increment_propagation_count }
+      update_entries.each do |entry|
+        publish(entry.member_id, entry.status) if entry.propagation_count.zero?
+        member(entry.member_id).increment_propagation_count
+      end
 
       ms = @members.values.flat_map(&:prepare_output)
       ms.each { |message| message.payload[:updates] = update_entries }
@@ -86,6 +95,10 @@ module Gossip
     end
 
     private
+
+    def publish(member_id, status)
+      @subscribers.each { |s| s.call(member_id, status) }
+    end
 
     def update_suspicions(updates)
       updates.each do |u|

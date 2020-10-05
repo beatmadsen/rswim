@@ -10,6 +10,10 @@ module Gossip
       @t = @r = 1
     end
 
+    def subscribe(&block)
+      @member_pool.subscribe(&block)
+    end
+
     def advance(input_messages, elapsed_seconds)
       @t += elapsed_seconds * 1000
       @t = 0 if @t >= @t_ms

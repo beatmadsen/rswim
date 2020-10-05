@@ -15,6 +15,13 @@ module Gossip
       @agent = Gossip::Agent::SleepBased.new(@pipe, @my_id, seed_ids)
     end
 
+    def subscribe(&block)
+      @agent.subscribe do |id, status|
+        host = @directory.host(id)
+        block.call(host, status)
+      end
+    end
+
     # blocks until interrupted
     def start
       logger.info 'starting node'
