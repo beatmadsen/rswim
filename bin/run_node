@@ -8,7 +8,8 @@ PORT = 4545
 puts "Enter seed nodes"
 input = gets
 hosts = input.split(" ")
-abort 'No seed nodes entered' if hosts.nil? || hosts.empty?
+abort 'EOF' if hosts.nil?
+puts "Operating with no seed nodes" if hosts.empty?
 
 puts "Starting node"
 
