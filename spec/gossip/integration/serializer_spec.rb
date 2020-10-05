@@ -1,5 +1,5 @@
-RSpec.describe Gossip::Integration::Udp::Serializer do
-  let(:directory) { Gossip::Integration::Udp::Directory.new }
+RSpec.describe Gossip::Integration::Serializer do
+  let(:directory) { Gossip::Directory.new }
 
   subject { described_class.new(directory) }
 
@@ -8,7 +8,7 @@ RSpec.describe Gossip::Integration::Udp::Serializer do
   end
 
   context 'given a deserialized message' do
-    let(:deserializer) { Gossip::Integration::Udp::Deserializer.new(directory, 42)}
+    let(:deserializer) { Gossip::Integration::Deserializer.new(directory, 42)}
 
     let(:wire_message) do
       m = <<~EOS
@@ -18,7 +18,7 @@ RSpec.describe Gossip::Integration::Udp::Serializer do
       192.168.19.14 alive 2
       192.168.19.15 alive 4
       EOS
-      m.strip     
+      m.strip
     end
 
     let(:message) { deserializer.deserialize('sender', wire_message) }

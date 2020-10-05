@@ -5,14 +5,10 @@ require 'socket'
 module Gossip
   module Integration
     module Udp
-      class Node
+      class Node < Gossip::Node
         def initialize(my_host, port)
-          @directory = Directory.new
+          super(my_host)
           @port = port
-          # public IP
-          @my_host = my_host
-          @my_id = @directory.id(@my_host)
-          @deserializer = Deserializer.new(@directory, @my_id)
           @started = false
         end
 
@@ -43,14 +39,6 @@ module Gossip
           logger.debug("Error: #{e}")
         end
 
-        protected
-
-        def logger
-          @_logger ||= begin
-            Gossip::Logger.new(self.class, STDERR)
-          end
-        end
-
         private
 
         def listen
@@ -62,7 +50,7 @@ module Gossip
               message = @deserializer.deserialize(sender[3], text)
               logger.debug "received message of type #{message.type} with #{message.payload[:updates]&.size.to_i} updates"
 
-              # TODO: we would never reply, instead we would send to standard port at host
+              #  TODO: we would never reply, instead we would send to standard port at host
               # assuming the other peer is listening too.
               @s.send("ok\n", 0, sender[3], sender[1])
             end
