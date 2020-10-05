@@ -7,6 +7,7 @@ module Gossip
     module Udp
       class Node < Gossip::Node
         def initialize(my_host, seed_hosts, port)
+          my_host ||= Socket.ip_address_list.find { |x| x.ipv4_private? }.ip_address
           super(my_host, seed_hosts)
           @port = port
         end

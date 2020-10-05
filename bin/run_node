@@ -12,7 +12,7 @@ abort 'No seed nodes entered' if hosts.nil? || hosts.empty?
 
 puts "Starting node"
 
-node = Gossip::Integration::Udp::Node.new('localhost', hosts, PORT)
+node = Gossip::Integration::Udp::Node.new(nil, hosts, PORT)
 
 node.subscribe do |host, status|
   puts "Update: #{host} entered state #{status}"
