@@ -5,28 +5,19 @@ puts "Ruby version: #{RUBY_VERSION}"
 
 PORT = 4545
 
+puts "Enter seed nodes"
+input = gets
+hosts = input.split(" ")
+abort 'No seed nodes entered' if hosts.nil? || hosts.empty?
+
 puts "Starting node"
 
-node = Gossip::Integration::Udp::Node.new('localhost', PORT)
-node.start
+node = Gossip::Integration::Udp::Node.new('localhost', hosts, PORT)
 
 # Input thread (stdin)
 puts "Ready\n"
 begin
-  loop do
-    input = gets
-    break if input.nil?
-    input.strip!
-    puts "read input: #{input}"
-    case input
-    when "start"
-      puts "starting"
-      node.start
-    when "stop"
-      puts "stopping"
-      node.stop
-    end
-  end
+  node.start  
 rescue Interrupt
 end
 puts "\nDone"
