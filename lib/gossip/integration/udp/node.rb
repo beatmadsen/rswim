@@ -17,7 +17,7 @@ module Gossip
         def before_start
           @in_s = UDPSocket.new
           @out_s = UDPSocket.new
-          @in_s.bind(nil, @port)
+          @in_s.bind(@my_host, @port)
           logger.info "node listening on UDP port #{@port}"
           Thread.new { receive }.tap { |t| t.abort_on_exception = true }
           Thread.new { send }.tap { |t| t.abort_on_exception = true }
