@@ -1,27 +1,29 @@
 #!/usr/bin/env ruby --jit
 require "bundler/setup"
-require 'gossip'
+require 'rswim'
 puts "Ruby version: #{RUBY_VERSION}"
 
 PORT = 4545
 
 puts "Enter seed nodes"
 input = gets
-hosts = input.split(" ")
-abort 'EOF' if hosts.nil?
-puts "Operating with no seed nodes" if hosts.empty?
+seed_hosts = input.split(" ")
+abort 'EOF' if seed_hosts.nil?
+puts "Operating with no seed nodes" if seed_hosts.empty?
 
 puts "Starting node"
 
-node = Gossip::Integration::Udp::Node.new(nil, hosts, PORT)
+# Instantiate node, setting my_host to nil to auto detect host IP.
+node = RSwim::Node.udp(nil, seed_hosts, PORT)
 
+# Subscribe to updates
 node.subscribe do |host, status|
   puts "Update: #{host} entered state #{status}"
 end
 
-# Input thread (stdin)
 puts "Ready\n"
 begin
+  # Run node (blocking)
   node.start
 rescue Interrupt
 end

@@ -1,15 +1,21 @@
-# Gossip
+# RSwim
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/gossip`. To experiment with that code, run `bin/console` for an interactive prompt.
+RSwim is a Ruby implementation of the SWIM gossip protocol, a mechanism for discovering new peers and getting updates about liveness of existing peers in a network.
 
-TODO: Delete this and the text above, and describe your gem
+It is an implementation inspired by the original [SWIM: Scalable Weakly-consistent Infection-style Process Group Membership Protocol](https://www.cs.cornell.edu/projects/Quicksilver/public_pdfs/SWIM.pdf) paper by Abhinandan Das, Indranil Gupta, Ashish Motivala.
+
+The implementation is kept intentionally simple and limited to the features described in the paper.
+No attempts have been made to address known security issues such as Byzantine attacks.
+
+Currently RSwim runs on UDP with a custom, human readable serialization format.
+
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'gossip'
+gem 'rswim'
 ```
 
 And then execute:
@@ -18,11 +24,38 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install gossip
+    $ gem install rswim
 
 ## Usage
 
-TODO: Write usage instructions here
+Example:
+```ruby
+  require 'rswim'
+
+  port = 4545
+
+  # known, running nodes to connect with initially.
+  seed_hosts = ['192.168.1.42', '192.168.1.43']
+
+  puts "Starting node"
+
+  # Instantiate node, setting my_host to nil to auto detect host IP.
+  node = RSwim::Node.udp(nil, seed_hosts, port)
+
+  # Subscribe to updates
+  node.subscribe do |host, status|
+    puts "Update: #{host} entered state #{status}"
+  end
+
+  puts "Ready\n"
+  begin
+    # Run node (blocking)
+    node.start
+  rescue Interrupt
+  end
+  puts "\nDone"
+
+```
 
 ## Development
 
@@ -32,7 +65,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/gossip.
+Bug reports and pull requests are welcome on GitHub at https://github.com/beatmadsen/rswim.
 
 ## License
 

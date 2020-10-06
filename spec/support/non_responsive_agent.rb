@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class NonResponsiveAgent < Gossip::Agent::FiberBased
+class NonResponsiveAgent < RSwim::Agent::FiberBased
   attr_writer :next_pause_seconds
 
   def initialize(pipe)
