@@ -4,17 +4,29 @@ module RSwim
   module Member
     module HealthState
       class Alive < Base
-        def initialize(id, member_pool, update_entry = UpdateEntry.new(id, :alive, 0, 0))
+        def initialize(id, node_member_id, member_pool, must_propagate: false)
           super
           @failed_to_reply = false
         end
 
         def advance(_elapsed_seconds)
           if @failed_to_reply
-            ue = UpdateEntry.new(@id, :suspected, @update_entry.incarnation_number, -1)
-            Suspected.new(@id, @member_pool, ue, true)
+            Suspected.new(@id, @node_member_id, @member_pool, must_propagate: true, send_ping_request: true)
           else
             self
+          end
+        end
+
+        def update_suspicion(status, old_incarnation_number, gossip_incarnation_number)
+          case status
+          when :confirmed then Confirmed.new(@id, @node_member_id, @member_pool)
+          when :suspected
+            if gossip_incarnation_number >= old_incarnation_number
+              Suspected.new(@id, @node_member_id, @member_pool, send_ping_request: false)
+            else
+              self
+            end
+          when :alive then self
           end
         end
 
@@ -24,6 +36,10 @@ module RSwim
 
         def can_be_pinged?
           true
+        end
+
+        def status
+          :alive
         end
       end
     end

@@ -1,30 +1,59 @@
 #!/usr/bin/env ruby --jit
-require "bundler/setup"
+require 'bundler/setup'
+require 'slop'
 require 'rswim'
-puts "Ruby version: #{RUBY_VERSION}"
 
 PORT = 4545
 
-puts "Enter seed nodes"
-input = gets
-seed_hosts = input.split(" ")
-abort 'EOF' if seed_hosts.nil?
-puts "Operating with no seed nodes" if seed_hosts.empty?
+opts = Slop.parse do |o|
+  o.array '-s', '--seeds', 'a comma separated list of seed nodes'
+  o.bool '-d', '--debug', 'turn on debug logging'
+  o.on '--help' do
+    puts o
+    exit
+  end
+  o.on '-v', '--version' do
+    puts RSwim::VERSION
+    exit
+  end
+end
 
-puts "Starting node"
+puts "Ruby version: #{RUBY_VERSION}"
+
+RSwim::Logger.level = ::Logger::DEBUG if opts.debug?
+seed_hosts = opts[:seeds]
+abort 'EOF' if seed_hosts.nil?
+
+if seed_hosts.empty?
+  puts 'Operating with no seed nodes'
+else
+  seed_hosts.each { |h| puts "Seed node: #{h}" }
+end
+
+puts 'Starting node'
 
 # Instantiate node, setting my_host to nil to auto detect host IP.
-node = RSwim::Node.udp(nil, seed_hosts, PORT)
+node = RSwim::Node.udp(nil, seed_hosts, PORT, 3_500, 1_000)
 
 # Subscribe to updates
-node.subscribe do |host, status|
-  puts "Update: #{host} entered state #{status}"
+node.subscribe do |host, status, custom_state|
+  puts "Update: #{host} entered liveness state #{status} with custom state #{custom_state}"
 end
+
+Thread.new do
+  uptime = 0
+  loop do
+    sleep(5)
+    uptime += 5
+    node.append_custom_state(:uptime_seconds, uptime)
+  end
+end.abort_on_exception = true
 
 puts "Ready\n"
 begin
   # Run node (blocking)
   node.start
 rescue Interrupt
+  puts "\nShutting down gracefully"
 end
 puts "\nDone"

@@ -5,7 +5,7 @@ module RSwim
     class Base
       def initialize(pipe, node_member_id, seed_member_ids, t_ms, r_ms)
         @pipe = pipe
-        @state = ProtocolState.new(node_member_id, seed_member_ids, t_ms, r_ms)
+        @state = new_protocol_state(node_member_id, seed_member_ids, t_ms, r_ms)
       end
 
       def subscribe(&block)
@@ -20,7 +20,15 @@ module RSwim
         end
       end
 
+      def append_custom_state(key, value)
+        @state.append_custom_state(key, value)
+      end
+
       protected
+
+      def new_protocol_state(node_member_id, seed_member_ids, t_ms, r_ms)
+        ProtocolState.new(node_member_id, seed_member_ids, t_ms, r_ms)
+      end
 
       def pause
         raise 'implement this in a subclass'
@@ -32,7 +40,7 @@ module RSwim
     end
 
     class SleepBased < Base
-      def initialize(pipe, node_member_id, seed_member_ids, sleep_time_seconds = 0.1, t_ms = T_MS, r_ms = R_MS)
+      def initialize(pipe, node_member_id, seed_member_ids, t_ms, r_ms, sleep_time_seconds = 0.1)
         super(pipe, node_member_id, seed_member_ids, t_ms, r_ms)
         @sleep_time_seconds = sleep_time_seconds
       end

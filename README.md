@@ -4,7 +4,8 @@ RSwim is a Ruby implementation of the SWIM gossip protocol, a mechanism for disc
 
 It is an implementation inspired by the original [SWIM: Scalable Weakly-consistent Infection-style Process Group Membership Protocol](https://www.cs.cornell.edu/projects/Quicksilver/public_pdfs/SWIM.pdf) paper by Abhinandan Das, Indranil Gupta, Ashish Motivala.
 
-The implementation is kept intentionally simple and limited to the features described in the paper.
+The implementation is kept intentionally simple and limited to the features described in the paper, except for the addition in version 2.0.0 of the ability to piggyback custom state on the liveness propagation mechanism, see `RSwim::Node#append_custom_state`
+
 No attempts have been made to address known security issues such as Byzantine attacks.
 
 Currently RSwim runs on UDP with a custom, human readable serialization format.
@@ -27,6 +28,7 @@ Or install it yourself as:
     $ gem install rswim
 
 ## Usage
+To try out a small demo script, execute `bin/run_node --help` for more information.
 
 Example:
 ```ruby
@@ -43,9 +45,19 @@ Example:
   node = RSwim::Node.udp(nil, seed_hosts, port)
 
   # Subscribe to updates
-  node.subscribe do |host, status|
-    puts "Update: #{host} entered state #{status}"
+  node.subscribe do |host, status, custom_state|
+    puts "Update: #{host} entered liveness state #{status} with custom state #{custom_state}"
   end
+  
+  # Periodically append new state for publishing
+  Thread.new do
+    uptime = 0
+    loop do
+      sleep(5)
+      uptime += 5
+      node.append_custom_state(:uptime_seconds, uptime)
+    end
+  end.abort_on_exception = true
 
   puts "Ready\n"
   begin

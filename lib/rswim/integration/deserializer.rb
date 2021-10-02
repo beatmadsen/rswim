@@ -26,25 +26,31 @@ module RSwim
       protected
 
       def logger
-        @_logger ||= begin
-          RSwim::Logger.new(self.class, STDERR)
-        end
+        @_logger ||= RSwim::Logger.new(self.class, $stderr)
       end
 
       private
 
       def parse_updates(lines)
         lines.map do |l|
-          begin
-            # host status incarnation_number
-            host, status, incarnation_number = l.strip.split(' ')
-            id = @directory.id(host)
-            UpdateEntry.new(id, status.to_sym, incarnation_number.to_i)
-          rescue StandardError => e
-            logger.debug("Failed to parse line `#{l}`: #{e}")
-            nil
-          end
+          # host status incarnation_number
+          host, status, incarnation_number, *pairs = l.strip.split(' ')
+          id = @directory.id(host)
+          custom_state = parse_custom_state(pairs)
+
+          UpdateEntry.new(id, status.to_sym, incarnation_number.to_i, custom_state)
+        rescue StandardError => e
+          logger.debug("Failed to parse line `#{l}`: #{e}")
+          nil
         end.tap(&:compact!)
+      end
+
+      def parse_custom_state(pairs)
+        pairs.each_slice(2).map do |(key, value)|
+          raise 'bad custom state' if !key.end_with?(':') || value.nil?
+
+          [key[0..-2].to_sym, value]
+        end.to_h
       end
     end
   end

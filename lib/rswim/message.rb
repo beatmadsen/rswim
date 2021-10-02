@@ -14,5 +14,9 @@ module RSwim
     def to_s
       "message of type #{type} from #{from} to #{to} with #{payload[:updates].to_a.size} updates"
     end
+
+    def ==(other)
+      %i[to from type payload].all? { |a| send(a) == other.send(a) }
+    end
   end
 end

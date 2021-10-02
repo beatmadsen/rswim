@@ -5,6 +5,7 @@ module RSwim
     class Base
       def initialize(id)
         @id = id
+        @incarnation_number = 0        
       end
     end
   end

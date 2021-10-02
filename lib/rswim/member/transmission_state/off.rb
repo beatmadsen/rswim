@@ -4,8 +4,8 @@ module RSwim
   module Member
     module TransmissionState
       class Off < Base
-        def initialize(id)
-          super(id, nil, nil, [], [])
+        def initialize(id, node_member_id)
+          super(id, node_member_id, nil, [], [])
         end
 
         def member_replied_with_ack
