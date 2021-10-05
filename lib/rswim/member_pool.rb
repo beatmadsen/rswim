@@ -11,9 +11,13 @@ module RSwim
       @subscribers = []
     end
 
+    def append_custom_state(key, value)
+      @me.append_custom_state(key, value)
+    end
+
     def update_member(message)
       updates = message.payload[:updates]
-      update_suspicions(updates) unless updates.nil?
+      incorporate_gossip(updates) unless updates.nil?
 
       sender = member(message.from) # NB: records member if not seen before
       case message.type
@@ -41,19 +45,19 @@ module RSwim
       @subscribers << block
     end
 
-
     def prepare_output
+      ms = @members.values.flat_map(&:prepare_output)
+      return ms if ms.empty?
+
       update_entries = @members.map { |_k, member| member.prepare_update_entry }
-                               # .select { |entry| entry.propagation_count < 5 }
-                               .sort_by { |entry| entry.propagation_count } # sort ascending!
+                               .sort_by(&:propagation_count) # sort ascending!
                                .take(15) # TODO: constant
 
       update_entries.each do |entry|
-        publish(entry.member_id, entry.status) if entry.propagation_count.zero?
+        publish(entry) if entry.propagation_count.zero?
         member(entry.member_id).increment_propagation_count
       end
 
-      ms = @members.values.flat_map(&:prepare_output)
       ms.each { |message| message.payload[:updates] = update_entries }
       ms
     end
@@ -62,8 +66,7 @@ module RSwim
       ms = @members.values.select(&:can_be_pinged?)
       return if ms.empty?
 
-      index = ms.one? ? 0 : rand(ms.size)
-      member = ms[index]
+      member = random_member(ms)
       member.ping!
     end
 
@@ -83,6 +86,7 @@ module RSwim
 
     def remove_member(member_id)
       raise 'boom' if member_id == @node_member_id
+
       @members.delete(member_id)
     end
 
@@ -94,20 +98,29 @@ module RSwim
       member(member_id).failed_to_reply
     end
 
-    private
+    protected
 
-    def publish(member_id, status)
-      @subscribers.each { |s| s.call(member_id, status) }
+    def random_member(members)
+      index = members.one? ? 0 : rand(members.size)
+      members[index]
     end
 
-    def update_suspicions(updates)
+    private
+
+    def publish(update_entry)
+      @subscribers.each { |s| s.call(update_entry) }
+    end
+
+    def incorporate_gossip(updates)
       updates.each do |u|
-        member(u.member_id).update_suspicion(u.status, u.incarnation_number)
+        m = member(u.member_id)
+        m.incorporate_gossip(u)
       end
     end
 
     def member(id)
       raise 'boom' if id.nil?
+
       @members[id] ||= Member::Peer.new(id, @node_member_id, self)
     end
   end

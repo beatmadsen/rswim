@@ -13,9 +13,9 @@ RSpec.describe RSwim::Integration::Serializer do
     let(:wire_message) do
       m = <<~EOS
       ping-req 192.168.19.24
-      192.168.19.12 alive 1
+      192.168.19.12 alive 1 custom-key: custom-value other-k: other-v dingo: 3
       192.168.19.13 suspected 3
-      192.168.19.14 alive 2
+      192.168.19.14 alive 2 meltdown: 2
       192.168.19.15 alive 4
       EOS
       m.strip

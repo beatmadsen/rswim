@@ -5,13 +5,17 @@ module RSwim
     def initialize(node_member_id, seed_member_ids, t_ms, r_ms)
       @t_ms = t_ms
       @r_ms = r_ms
-      @member_pool = MemberPool.new(node_member_id, seed_member_ids)
+      @member_pool = new_member_pool(node_member_id, seed_member_ids)
       @node_member_id = node_member_id
       @t = @r = 1
     end
 
     def subscribe(&block)
       @member_pool.subscribe(&block)
+    end
+
+    def append_custom_state(key, value)
+      @member_pool.append_custom_state(key, value)
     end
 
     def advance(input_messages, elapsed_seconds)
@@ -48,6 +52,12 @@ module RSwim
       @member_pool.status_report if @r == 0
 
       output_messages
+    end
+
+    protected
+
+    def new_member_pool(node_member_id, seed_member_ids)
+      MemberPool.new(node_member_id, seed_member_ids)
     end
 
     private
