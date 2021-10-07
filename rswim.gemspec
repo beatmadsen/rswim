@@ -30,7 +30,8 @@ Gem::Specification.new do |spec|
   
   spec.add_dependency 'zeitwerk', '~> 2.2'
   spec.add_dependency 'slop', '~> 4.9'
-
+  spec.add_dependency 'async', '~> 1.30'
+  
   spec.add_development_dependency "bundler", ">= 2.2.10"
   spec.add_development_dependency "rake", "~> 12.0"
   spec.add_development_dependency "rspec", "~> 3.0"

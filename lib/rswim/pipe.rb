@@ -24,8 +24,7 @@ module RSwim
       attr_reader :q_in, :q_out
 
       def initialize
-        @q_in, @q_out = 2.times.map { Queue.new }
-        super(@q_in, @q_out)
+        super(Queue.new, Queue.new)
       end
     end
   end

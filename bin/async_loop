@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby --jit
+require 'bundler/setup'
+require 'async'
+require 'rswim'
+
+PORT = 4545
+
+@stuff = []
+
+def read
+  if @stuff.empty?
+    sleep 2
+  end
+  Array.new(@stuff.size) { @stuff.pop }
+end 
+
+puts "Ready\n"
+begin
+  # Run node (blocking)
+  Async do
+    Fiber.schedule do
+      in_s = UDPSocket.new
+      my_host = "localhost" # Socket.ip_address_list.find(&:ipv4_private?).ip_address
+      
+      in_s.bind(my_host, PORT)
+      loop do
+        text, sender = in_s.recvfrom(10_000)
+        puts "received #{text} from network"
+        @stuff << text
+      end
+    end
+    loop { puts "Read: #{read }" }
+  end
+rescue Interrupt
+  puts "\nShutting down gracefully"
+end
+puts "\nDone"

@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 require 'logger'
+require 'socket'
 require 'zeitwerk'
-require 'byebug'
+require 'async'
 
 # frozen_string_literal: true
 
@@ -10,6 +11,8 @@ class MyInflector < Zeitwerk::Inflector
   def camelize(basename, _abspath)
     case basename
     when 'rswim' then 'RSwim'
+    when 'udp' then 'UDP'
+    when 'io_loop' then 'IOLoop'
     else super
     end
   end
@@ -29,5 +32,4 @@ module RSwim
   R_MS = 10_000
 
   class Error < StandardError; end
-  # Your code goes here...
 end

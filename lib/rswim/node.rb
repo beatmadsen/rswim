@@ -1,22 +1,23 @@
 # frozen_string_literal: true
 
-require 'socket'
-
 module RSwim
   class Node
+    def self.udp(my_host, seed_hosts, port, t_ms = T_MS, r_ms = R_MS)
+      Integration::UDP::Node.new(my_host, seed_hosts, port, t_ms, r_ms)
+    end
+
     def initialize(my_host, seed_hosts, t_ms, r_ms)
       @my_host = my_host
       @directory = Directory.new
       @my_id = @directory.id(@my_host)
       @deserializer = Integration::Deserializer.new(@directory, @my_id)
       @serializer = Integration::Serializer.new(@directory)
-      @pipe = RSwim::Pipe.simple
-      seed_ids = seed_hosts.map { |host| @directory.id(host) }
-      @agent = RSwim::Agent::SleepBased.new(@pipe, @my_id, seed_ids, t_ms, r_ms)
-    end
-
-    def self.udp(my_host, seed_hosts, port, t_ms = T_MS, r_ms = R_MS)
-      Integration::Udp::Node.new(my_host, seed_hosts, port, t_ms, r_ms)
+      @seed_ids = seed_hosts.map { |host| @directory.id(host) }
+      @t_ms = t_ms
+      @r_ms = r_ms
+      @agent = RSwim::Agent::PushBased.new(@my_id, @seed_ids, t_ms, r_ms)
+      @sleep_time_seconds = r_ms / 1_000
+      @io_loop = create_io_loop
     end
 
     def subscribe(&block)
@@ -30,18 +31,17 @@ module RSwim
       @agent.append_custom_state(key, value)
     end
 
-    # blocks until interrupted
     def start
       logger.info 'starting node'
-      before_start
       @agent.run
+      @io_loop.run
     rescue StandardError => e
       logger.error("Node failed: #{e}")
     end
 
     protected
 
-    def before_start
+    def create_io_loop
       raise 'must be implemented in subclass'
     end
 
