@@ -3,7 +3,7 @@ RSpec.describe RSwim::ProtocolState do
   it 'can be instantiated' do
     expect(subject).to be_a(described_class)
   end
-
+  
   context 'without incoming messages' do
     let!(:out) do
       subject.advance([], RSwim::T_MS / 1000.0)

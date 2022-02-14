@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby --jit
+
+require 'openssl'
+require 'console'
+
+cipher = OpenSSL::Cipher::AES256.new :CBC
+cipher.encrypt
+iv = cipher.random_iv
+cipher.key = key = Digest::SHA256.digest 'SecretPassword'
+cipher_text = cipher.update('This is a secret message') + cipher.final
+
+Console.logger.info cipher_text, 'got this after encrypting'
+
+begin
+  decipher = OpenSSL::Cipher::AES256.new :CBC
+  decipher.decrypt
+  decipher.iv = iv # previously saved
+  decipher.key = Digest::SHA256.digest 'mismatch'
+  plain_text = decipher.update(cipher_text) + decipher.final
+
+  Console.logger.info plain_text, 'got this after decrypting'
+rescue OpenSSL::Cipher::CipherError => e
+  Console.logger.error('Error while decrypting')
+  Console.logger.failure(decipher, e)
+end
