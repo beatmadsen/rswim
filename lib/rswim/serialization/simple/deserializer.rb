@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RSwim
-  module Integration
+  module Serialization::Simple
     class Deserializer
       def initialize(directory, my_id)
         @directory = directory

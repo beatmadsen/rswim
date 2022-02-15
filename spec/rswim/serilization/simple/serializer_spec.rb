@@ -1,4 +1,4 @@
-RSpec.describe RSwim::Integration::Serializer do
+RSpec.describe RSwim::Serialization::Simple::Serializer do
   let(:directory) { RSwim::Directory.new }
 
   subject { described_class.new(directory) }
@@ -8,7 +8,7 @@ RSpec.describe RSwim::Integration::Serializer do
   end
 
   context 'given a deserialized message' do
-    let(:deserializer) { RSwim::Integration::Deserializer.new(directory, 42)}
+    let(:deserializer) { RSwim::Serialization::Simple::Deserializer.new(directory, 42)}
 
     let(:wire_message) do
       m = <<~EOS

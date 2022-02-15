@@ -21,6 +21,9 @@ end
 puts "Ruby version: #{RUBY_VERSION}"
 
 RSwim::Logger.level = ::Logger::DEBUG if opts.debug?
+RSwim.encrypted = true
+RSwim.shared_secret = 'santa 2000'
+
 seed_hosts = opts[:seeds]
 abort 'EOF' if seed_hosts.nil?
 
