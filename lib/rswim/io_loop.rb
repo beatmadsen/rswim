@@ -12,8 +12,8 @@ module RSwim
     end
 
     def run
-      before_run
       Async do
+        before_run
         start_producer
         loop do
           in_messages = consume_read_buffer

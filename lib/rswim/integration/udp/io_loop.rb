@@ -46,7 +46,7 @@ module RSwim
           @in_s = UDPSocket.new
           @in_s.bind(@my_host, @port)
           @out_q = Queue.new
-          Thread.new { Sender.new(@port, @out_q).run }.abort_on_exception = true
+          Fiber.schedule { Sender.new(@port, @out_q).run }
         end
 
         def read
