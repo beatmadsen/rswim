@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rswim (2.1.0)
+    rswim (2.2.0)
       async (~> 1.30)
       slop (~> 4.9)
       zeitwerk (~> 2.2)

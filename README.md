@@ -4,11 +4,14 @@ RSwim is a Ruby implementation of the SWIM gossip protocol, a mechanism for disc
 
 It is an implementation inspired by the original [SWIM: Scalable Weakly-consistent Infection-style Process Group Membership Protocol](https://www.cs.cornell.edu/projects/Quicksilver/public_pdfs/SWIM.pdf) paper by Abhinandan Das, Indranil Gupta, Ashish Motivala.
 
-The implementation is kept intentionally simple and limited to the features described in the paper, except for the addition in version 2.0.0 of the ability to piggyback custom state on the liveness propagation mechanism, see `RSwim::Node#append_custom_state`
+The implementation is kept intentionally simple and includes only the features described in the paper along with a few additions after version 2.0.0:
+
+- The ability to piggyback custom state on the liveness propagation mechanism was added in version 2.0.0, see `RSwim::Node#append_custom_state`
+- Encryption of messsages between peers based on a shared secret was introduced in version 2.2.0, see module `RSwim::Serialization::Encrypted`
 
 No attempts have been made to address known security issues such as Byzantine attacks.
 
-Currently RSwim runs on UDP with a custom, human readable serialization format.
+Currently RSwim runs on UDP. In the unencrypted mode it uses a custom, human readable serialization format. Peers in unencrypted mode cannot communicate with peers in encrypted mode.
 
 
 ## Installation
@@ -33,6 +36,9 @@ To try out a small demo script, execute `bin/run_node --help` for more informati
 Example:
 ```ruby
   require 'rswim'
+
+  RSwim.encrypted = true
+  RSwim.shared_secret = 'santa 2000'
 
   port = 4545
 
