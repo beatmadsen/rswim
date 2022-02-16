@@ -7,11 +7,13 @@ module RSwim
     end
 
     def initialize(my_host, seed_hosts, t_ms, r_ms)
+      RSwim.validate_config!
       @my_host = my_host
       @directory = Directory.new
       @my_id = @directory.id(@my_host)
-      @deserializer = Integration::Deserializer.new(@directory, @my_id)
-      @serializer = Integration::Serializer.new(@directory)
+      serialization = RSwim.encrypted ? Serialization::Encrypted : Serialization::Simple
+      @deserializer = serialization::Deserializer.new(@directory, @my_id)
+      @serializer = serialization::Serializer.new(@directory)
       @seed_ids = seed_hosts.map { |host| @directory.id(host) }
       @t_ms = t_ms
       @r_ms = r_ms

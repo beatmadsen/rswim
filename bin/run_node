@@ -8,6 +8,8 @@ PORT = 4545
 opts = Slop.parse do |o|
   o.array '-s', '--seeds', 'a comma separated list of seed nodes'
   o.bool '-d', '--debug', 'turn on debug logging'
+  o.bool '-e', '--encrypted', 'use encrypted mode'
+  o.string '--secret', 'shared secret for encrypted mode', default: 'santa 2000'
   o.on '--help' do
     puts o
     exit
@@ -21,6 +23,12 @@ end
 puts "Ruby version: #{RUBY_VERSION}"
 
 RSwim::Logger.level = ::Logger::DEBUG if opts.debug?
+
+if opts.encrypted?
+  RSwim.encrypted = true
+  RSwim.shared_secret = opts[:secret]
+end
+
 seed_hosts = opts[:seeds]
 abort 'EOF' if seed_hosts.nil?
 
