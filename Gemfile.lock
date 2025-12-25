@@ -71,7 +71,7 @@ GEM
     ruby-progressbar (1.11.0)
     shellany (0.0.1)
     slop (4.9.1)
-    thor (1.2.1)
+    thor (1.4.0)
     timers (4.3.3)
     zeitwerk (2.5.4)
 
