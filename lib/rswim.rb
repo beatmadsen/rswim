@@ -7,11 +7,7 @@ require 'async'
 require 'openssl'
 require 'base64'
 
-cipher = OpenSSL::Cipher::AES256.new :CBC
-cipher.encrypt
-iv = cipher.random_iv
-cipher.key = key = Digest::SHA256.digest 'SecretPassword'
-cipher_text = cipher.update('This is a secret message') + cipher.final
+require_relative 'rswim/version'
 
 class MyInflector < Zeitwerk::Inflector
   def camelize(basename, _abspath)
@@ -26,6 +22,9 @@ end
 
 loader = Zeitwerk::Loader.for_gem
 loader.inflector = MyInflector.new
+# version.rb defines RSwim::VERSION, not the RSwim::Version the loader would
+# infer from the filename, so it is required above and left out of the loader.
+loader.ignore("#{__dir__}/rswim/version.rb")
 loader.setup
 
 module RSwim
